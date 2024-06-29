@@ -1,2 +1,3 @@
 # Minesweeper
-the og game
+the og game,
+but not the same.
