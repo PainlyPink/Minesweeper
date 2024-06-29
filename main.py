@@ -1,15 +1,6 @@
 from os import system, name
 import keyboard
 
-start: bool = False
-menu: list[str] = ['Start', 'About', 'Settings maybe', 'Exit [esc, x, q]']
-pos_menu: int = 0
-pos_x: int = 0
-pos_y: int = 0
-board_size: tuple[int, int] = (9, 9)
-board: list[list] = [['o' for _ in range(board_size[0])] for _ in range(board_size[1])]
-board[pos_y][pos_x] = 'x'
-
 def clear_screen() -> None:
     system('cls' if name == 'nt' else 'clear')
     
@@ -22,17 +13,17 @@ def rgb(text: str, clr) -> str:
 
 def play(dx: int, dy: int):
     global pos_x, pos_y
-    board[pos_y][pos_x] = 'o'
+    board[pos_y][pos_x] = piece
     pos_x = (pos_x + dx) % board_size[0]
     pos_y = (pos_y + -dy) % board_size[1]
-    board[pos_y][pos_x] = 'x'
+    board[pos_y][pos_x] = player
     display_board()
 
 def display_board() -> None:
     clear_screen()
     for row in board:
         for i in row:
-            if i == 'x':
+            if i == player:
                 print(rgb(i, 'rgb(230, 185, 166)'), end=' ')
             else:
                 print(rgb(i, 'rgb(47, 54, 69)'), end=' ')
@@ -40,23 +31,22 @@ def display_board() -> None:
 
 def display_menu(step: int) -> None:
     clear_screen()
-    print(rgb("\t\tWelcome!", 'rgb(54, 186, 152)'))
+    print(rgb("\tWelcome!", 'rgb(54, 186, 152)'))
     global pos_menu
     pos_menu = (pos_menu - step) % len(menu)
     for i in range(len(menu)):
         if i == pos_menu:
-            print(rgb(f'{' ' * 5}=> {menu[i]}', 'rgb(233, 196, 106)'))
+            print(rgb(f'-> {menu[i]}', 'rgb(233, 196, 106)'))
         else:
-            print(rgb(f'\t{menu[i]}', 'rgb(231, 111, 81)'))
+            print(rgb(f'{menu[i]}', 'rgb(231, 111, 81)'))
 
 def menu_choice() -> None:
     if pos_menu == 0:
-        global start
-        start = not start
+        global start; start = not start
         display_board()
     elif pos_menu == 1:
         clear_screen()
-        print(rgb("\tHafeez gender reveal (⊙o⊙) ??: ", 'rgb(228, 155, 255)'), rgb('g', 'rgb(255, 0, 0)'), rgb('a', 'rgb(0, 255, 0)'), rgb('y', 'rgb(0, 0, 255)'), sep='')
+        print(rgb("Hafeez gender reveal (⊙o⊙) ??: ", 'rgb(228, 155, 255)'), rgb('g', 'rgb(255, 0, 0)'), rgb('a', 'rgb(0, 255, 0)'), rgb('y', 'rgb(0, 0, 255)'), sep='')
         from time import sleep
         sleep(2)
         display_menu(pos_menu)
@@ -69,7 +59,7 @@ def get_key() -> None:
     while True:
         event: keyboard.KeyboardEvent = keyboard.read_event()
         if event.event_type == keyboard.KEY_UP:
-            key: str = event.name
+            key: str = event.name.lower()
             break
 
     global start
@@ -103,4 +93,11 @@ def main() -> None:
         get_key()
 
 if __name__ == "__main__":
+    start: bool = False
+    menu: list[str] = ['Start', 'About', 'Settings maybe', 'Exit [esc, x, q]']
+    pos_menu: int = 0; pos_x: int = 0; pos_y: int = 0
+    board_size: tuple[int, int] = (9, 9)
+    piece: str = '🐀'; player: str = '🐍'
+    board: list[list] = [[piece for _ in range(board_size[0])] for _ in range(board_size[1])]
+    board[pos_y][pos_x] = player
     main()
