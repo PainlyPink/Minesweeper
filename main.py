@@ -97,7 +97,7 @@ if __name__ == "__main__":
     menu: list[str] = ['Start', 'About', 'Settings maybe', 'Exit [esc, x, q]']
     pos_menu: int = 0; pos_x: int = 0; pos_y: int = 0
     board_size: tuple[int, int] = (9, 9)
-    piece: str = '🐀'; player: str = '🐍'
+    piece: str = '🐀'; player: str = 'ψ'
     board: list[list] = [[piece for _ in range(board_size[0])] for _ in range(board_size[1])]
     board[pos_y][pos_x] = player
     main()
