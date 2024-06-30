@@ -1,7 +1,7 @@
 from os import system, name
 import keyboard
 
-# u see my ass? 🍑
+# u see my ass? 🍑 => response
 
 def clear_screen() -> None:
     system('cls' if name == 'nt' else 'clear')
