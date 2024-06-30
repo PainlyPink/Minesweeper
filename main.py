@@ -56,16 +56,18 @@ def menu_choice() -> None:
         quit()
 
 def get_key() -> None:
-    while True:
-        event: keyboard.KeyboardEvent = keyboard.read_event()
-        if event.event_type == keyboard.KEY_UP:
-            key: str = event.name.lower()
-            break
+    event: keyboard.KeyboardEvent = keyboard.read_event(suppress=True)
+    if event.event_type == keyboard.KEY_UP:
+        key: str = event.name.lower()
+    else: return
 
     global start
     if start:
         if key in ['esc', 'x', 'q']:
             start = not start
+            global pos_x, pos_y
+            board[pos_y][pos_x] = piece
+            pos_x = pos_y = 0
             display_menu(pos_menu)
         elif key in ['up', 'w']:
             play(0, 1)
@@ -97,7 +99,7 @@ if __name__ == "__main__":
     menu: list[str] = ['Start', 'About', 'Settings maybe', 'Exit [esc, x, q]']
     pos_menu: int = 0; pos_x: int = 0; pos_y: int = 0
     board_size: tuple[int, int] = (9, 9)
-    piece: str = '🐀'; player: str = 'ψ'
+    piece: str = '📦'; player: str = ' ψ'
     board: list[list] = [[piece for _ in range(board_size[0])] for _ in range(board_size[1])]
     board[pos_y][pos_x] = player
     main()
