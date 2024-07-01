@@ -1,8 +1,6 @@
 from os import system, name
 import keyboard
 
-# u see my ass? 🍑
-
 def clear_screen() -> None:
     system('cls' if name == 'nt' else 'clear')
     
@@ -38,7 +36,8 @@ def display_menu(step: int) -> None:
     pos_menu = (pos_menu - step) % len(menu)
     for i in range(len(menu)):
         if i == pos_menu:
-            print(rgb(f'-> {menu[i]}', 'rgb(233, 196, 106)'))
+            s = f'{menu[i] + description[i]}'
+            print(rgb(f'-> {s}', 'rgb(233, 196, 106)'))
         else:
             print(rgb(f'{menu[i]}', 'rgb(231, 111, 81)'))
 
@@ -46,18 +45,12 @@ def menu_choice() -> None:
     if pos_menu == 0:
         global start; start = not start
         display_board()
-    elif pos_menu == 1:
-        clear_screen()
-        print(rgb("Arindam gender reveal hole or pole??? (⊙o⊙) ??: ", 'rgb(228, 155, 255)'), rgb('g', 'rgb(255, 0, 0)'), rgb('a', 'rgb(0, 255, 0)'), rgb('y', 'rgb(0, 0, 255)'), sep='')
-        from time import sleep
-        sleep(2)
-        display_menu(pos_menu)
-    elif pos_menu == 2:
-        pass
-    elif pos_menu == 3:
+    elif pos_menu == len(menu) - 1:
         quit()
 
 def get_key() -> None:
+    global game
+    if not game: return
     event: keyboard.KeyboardEvent = keyboard.read_event(suppress=True)
     if event.event_type == keyboard.KEY_UP:
         key: str = event.name.lower()
@@ -70,6 +63,7 @@ def get_key() -> None:
             global pos_x, pos_y
             board[pos_y][pos_x] = piece
             pos_x = pos_y = 0
+            board[pos_y][pos_x] = player
             display_menu(pos_menu)
         elif key in ['up', 'w']:
             play(0, 1)
@@ -87,18 +81,20 @@ def get_key() -> None:
         elif key in ['down', 's']:
             display_menu(-1)
         elif key == 'enter':
+            game = False
             menu_choice()
+            game = True
 
 def main() -> None:
     clear_screen()
     display_menu(0)
-    game: bool = True
-    while game:
+    while True:
         get_key()
 
 if __name__ == "__main__":
-    start: bool = False
-    menu: list[str] = ['Start', 'About', 'Settings maybe', 'Exit [esc, x, q]']
+    game: bool = True; start: bool = False
+    menu: list[str] = ['Start', 'Controls', 'About', 'Exit [esc, x, q]']
+    description: list[str] = [':\n\tenter to start...', ':\n\twasd OR arrows to move\n\tenter to open box\n\tf to flag box', ':\n\tmade by me', '\n\t🥺']
     pos_menu: int = 0; pos_x: int = 0; pos_y: int = 0
     board_size: tuple[int, int] = (9, 9)
     piece: str = '📦'; player: str = ' ψ'
