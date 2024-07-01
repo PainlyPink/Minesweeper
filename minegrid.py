@@ -1,11 +1,11 @@
 import random
 
 class Board:
-    def __init__(self, pos: tuple[int, int], size: tuple[int, int], n_mines: int) -> None:
+    def __init__(self, pos: tuple[int, int], size: tuple[int, int], mine_per: int) -> None:
         self.cpos = pos
         self.size_x = size[0]
         self.size_y = size[1]
-        self.n_mines = n_mines
+        self.n_mines = int(self.size_x * self.size_y * mine_per / 100)
         self.board = [[0] * self.size_x for _ in range(self.size_y)]
         self.mine_positions = []
         self.initial_safe_zone = self.get_initial_safe_zone()
@@ -35,7 +35,7 @@ class Board:
                 if 0 <= nx < self.size_x and 0 <= ny < self.size_y and self.board[ny][nx] != -1:
                     self.board[ny][nx] += 1
 
-    def display_board(self) -> None:
+    def reveal_board(self) -> None:
         for row in self.board:
             print(f'\t{"  ".join("*" if cell == -1 else str(cell) for cell in row)}')
 
@@ -46,10 +46,10 @@ class Board:
             raise ValueError("Position out of bounds")
 
 if __name__ == "__main__":
-    cpos = (2, 6)
-    board = Board(cpos, (9, 9), n_mines=10)
-    print(board.get_initial_safe_zone())
-    board.board[6][2] = 9
-    board.display_board()
-    cell_value = board.get_cell_value(*cpos)
-    print(f"Value at position {cpos}: {cell_value}")
+    from os import system, name
+    system('cls' if name == 'nt' else 'clear')
+    cpos: tuple[int, int] = tuple([int(i) for i in input().split()]) # type: ignore
+    board: Board = Board(cpos, (12, 12), mine_per=12)
+    board.board[cpos[1]][cpos[0]] = 9
+    board.reveal_board()
+    print(board.n_mines)
