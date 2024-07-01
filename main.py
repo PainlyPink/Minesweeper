@@ -1,6 +1,8 @@
 from os import system, name
 import keyboard
 
+# u see my ass? 🍑
+
 def clear_screen() -> None:
     system('cls' if name == 'nt' else 'clear')
     
@@ -46,7 +48,7 @@ def menu_choice() -> None:
         display_board()
     elif pos_menu == 1:
         clear_screen()
-        print(rgb("Hafeez gender reveal (⊙o⊙) ??: ", 'rgb(228, 155, 255)'), rgb('g', 'rgb(255, 0, 0)'), rgb('a', 'rgb(0, 255, 0)'), rgb('y', 'rgb(0, 0, 255)'), sep='')
+        print(rgb("Arindam gender reveal hole or pole??? (⊙o⊙) ??: ", 'rgb(228, 155, 255)'), rgb('g', 'rgb(255, 0, 0)'), rgb('a', 'rgb(0, 255, 0)'), rgb('y', 'rgb(0, 0, 255)'), sep='')
         from time import sleep
         sleep(2)
         display_menu(pos_menu)
