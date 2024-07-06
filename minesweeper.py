@@ -83,7 +83,11 @@ class Minesweeper:
         if self.numbers[pos] == 0:
             self.mine_values[pos] = ' 0'
             for i in self.get_neighbours(pos):
-                self.reveal(i)
+                if i not in self.revealed:
+                    if self.numbers[i] == 0:
+                        self.reveal(i)
+                    else:
+                        self.mine_values[i] = f' {self.numbers[i]}'
         else:
             self.mine_values[pos] = f' {self.numbers[pos]}'
     
@@ -105,11 +109,10 @@ class Minesweeper:
         self.flags.append(pos)
         
 from random import randint
-x, y = randint(0, 18), randint(0, 18)
-m = Minesweeper((x, y), (19, 19), 10)
-# while not m.over:
-#     print(m.mine_values)
-#     x, y = map(int, input("Enter pos example['3 5']: ").split())
-#     m.move((x, y))
-#     clear()
-print(m.mine_values)
+while True:
+    size = (80, 80)
+    x, y = randint(0, size[0] - 1), randint(0, size[1] - 1)
+    m = Minesweeper((x, y), size, 10)
+    print(m.mine_values)
+    input()
+    clear()
