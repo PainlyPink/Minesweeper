@@ -38,7 +38,6 @@ class Minesweeper:
         self.mine_values = Matrix2D(self.chr_box, size)
         self.mine_pos: set[tuple[int, int]] = set(); self.flags: list[tuple[int, int]] = []
         self.revealed: set[tuple[int, int]] = set()
-        self.cats = 0
         self.set_mines(pos)
         self.set_values()
         self.reveal(pos)
@@ -56,11 +55,11 @@ class Minesweeper:
         return res
         
     def set_mines(self, f_pos: tuple[int, int]):
-        import random
+        from random import randint
         bad_pos: list[tuple[int, int]]  = self.get_neighbours(f_pos, 2)
         bad_pos.append(f_pos)
         while len(self.mine_pos) < self.n_mines:
-            i = random.randint(0, self.size[0] * self.size[1] - 1)
+            i = randint(0, self.size[0] * self.size[1] - 1)
             pos = (i % self.size[0], i // self.size[0])
             if pos not in bad_pos and pos not in self.mine_pos:
                 self.mine_pos.add(pos)
@@ -82,10 +81,7 @@ class Minesweeper:
             return
         self.revealed.add(pos)
         if self.numbers[pos] == 0:
-            from random import choice
-            if choice([False] * len(self.mine_values) + [True]):
-                self.mine_values[pos] = '🐱'
-                self.cats += 1
+            self.mine_values[pos] = ' 0'
             for i in self.get_neighbours(pos):
                 self.reveal(i)
         else:
@@ -108,13 +104,12 @@ class Minesweeper:
         self.mine_values[pos] = self.chr_flag
         self.flags.append(pos)
         
-x, y = map(int, input("Enter pos example['3 5']: ").split())
+from random import randint
+x, y = randint(0, 18), randint(0, 18)
 m = Minesweeper((x, y), (19, 19), 10)
-while not m.over:
-    print(m.mine_values)
-    print(m.numbers)
-    print(m.cats)
-    x, y = map(int, input("Enter pos example['3 5']: ").split())
-    m.move((x, y))
-    clear()
+# while not m.over:
+#     print(m.mine_values)
+#     x, y = map(int, input("Enter pos example['3 5']: ").split())
+#     m.move((x, y))
+#     clear()
 print(m.mine_values)
