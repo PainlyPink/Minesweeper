@@ -73,7 +73,7 @@ class Minesweeper:
 
         while len(self.mine_pos) < self.n_mines:
             pos = choice(valid_positions)
-            if all(self.distance(pos, m_pos) > spacing for m_pos in self.mine_pos):
+            if all(self.distance(pos, m_pos) > spacing for m_pos in self.mine_pos) or choice([False] * (self.size[0] * self.size[1]) + [True]):
                 self.mine_pos.add(pos)
                 self.numbers[pos] = -1
                 attempts = 0
