@@ -19,13 +19,6 @@ class Matrix2D:
             for value in row:
                 yield value
 
-    def __len__(self):
-        return self.size[0] * self.size[1]
-
-
-def mul(t: tuple[int, int], factor: int) -> tuple[int, int]:
-    return t[0] * factor, t[1] * factor
-
 
 def clear():
     from os import system, name
@@ -33,7 +26,7 @@ def clear():
 
 
 class Minesweeper:
-    def __init__(self, pos: tuple[int, int], size: tuple[int, int], mine_density: int) -> None:
+    def __init__(self, size: tuple[int, int], mine_density: int) -> None:
         self.size = size
         self.n_mines = max(1, size[0] * size[1] * mine_density // 100)
         self.numbers = Matrix2D(0, size)
@@ -44,7 +37,10 @@ class Minesweeper:
         self.mine_pos: set[tuple[int, int]] = set()
         self.flags: set[tuple[int, int]] = set()
         self.revealed: set[tuple[int, int]] = set()
-        self.over = False
+        self.first = True
+        
+    def start(self, pos: tuple[int, int]):
+        self.prev = pos
         self.set_mines(pos)
         self.set_values()
         self.reveal(pos)
@@ -107,10 +103,14 @@ class Minesweeper:
             self.mine_values[pos] = f' {self.numbers[pos]}'
 
     def move(self, pos: tuple[int, int]):
+        if self.first:
+            self.first = False
+            self.start(pos)
+            return
         if self.numbers[pos] == -1:
             self.show_mines()
-            self.mine_values[pos] = '☠️'
-            self.over = True
+            self.mine_values[pos] = '☠️ '
+            # self.over = True
             return -1
         else:
             self.reveal(pos)
@@ -122,16 +122,5 @@ class Minesweeper:
         self.mine_values[pos] = self.chr_flag
         self.flags.add(pos)
 
-
-from random import randrange
-
-while True:
-    size = (18, 18)
-    x, y = randrange(0, size[0]), randrange(0, size[1])
-    m = Minesweeper((x, y), size, 10)
-    print(m.n_mines)
-    m.mine_values[(x, y)] = '🙏'
-    m.show_mines()
-    print(m.mine_values)
-    input()
-    clear()
+for i in Minesweeper((2, 2), 10).mine_values:
+    print(i)

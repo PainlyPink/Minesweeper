@@ -1,15 +1,20 @@
 class Pos:
-    def __init__(self, pos: tuple[int, int] = (0, 0), board: tuple[int, int] = (9, 9)) -> None:
-        self.pos = pos
+    def __init__(self, board: tuple[int, int] = (9, 9)) -> None:
+        self.pos = (0, 0)
+        self.prev = self.pos
         self.board = board
     
     def up(self):
+        self.prev = self.pos
         self.pos = (self.pos[0], (self.pos[1] - 1) % self.board[1])
     def down(self):
+        self.prev = self.pos
         self.pos = (self.pos[0], (self.pos[1] + 1) % self.board[1])
     def left(self):
+        self.prev = self.pos
         self.pos = ((self.pos[0] - 1) % self.board[0], self.pos[1])
     def right(self):
+        self.prev = self.pos
         self.pos = ((self.pos[0] + 1) % self.board[0], self.pos[1])
 
     def __getitem__(self, index: int):
@@ -42,13 +47,32 @@ def clear_screen() -> None:
 
 
 def display():
+    clear_screen()
     if menu_screen:
+        print(Color("\tWelcome!\n").header())
         for i, key in enumerate(menu):
             if pos[1] == i:
                 print(Color(key).select())
                 print(f'  {Color(menu[key]).desc()}')
             else:
                 print(Color(key).other())
+    else:
+        board = [row.copy() for row in grid.mine_values.matrix]
+        board[pos[1]][pos[0]] = '🕵️ '
+        for row in board:
+            print(' '.join(str(cell) for cell in row))
+
+
+def enter():
+    global menu_screen, pos
+    if menu_screen:
+        if pos[1] == 0:
+            menu_screen = False
+            pos = Pos(size)
+        elif pos[1] == 1:
+            pass # stuff
+    else:
+        grid.move(pos.pos)
 
 
 import keyboard
@@ -66,14 +90,13 @@ def get_key():
         pos.down()
     elif key in ['right', 'd']:
         pos.right()
-    
-    clear_screen()
-    print(Color("\tWelcome!\n").header())
+    elif key == 'enter':
+        enter()
+
     display()
 
 
 def main():
-    print(Color("\tWelcome!\n").header())
     display()
     while True:
         get_key()
@@ -87,6 +110,8 @@ if __name__ == "__main__":
         "About": "i am cool",
         "Exit [esc, q, x]": "( ﾉ ﾟｰﾟ)ﾉ"
     }
-    pos: Pos = Pos(board=(1, len(menu)))
-    clear_screen()
+    pos: Pos = Pos((1, len(menu)))
+    from minesweeper import Minesweeper
+    size = (20, 20)
+    grid: Minesweeper = Minesweeper(size, 10)
     main()
