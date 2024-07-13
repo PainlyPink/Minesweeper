@@ -12,7 +12,7 @@ build_exe_options = {
 
 # Setup configuration
 setup(
-    name="Minesweeper",  # Replace with your project name
+    name="not_minesweeper",  # Replace with your project name
     version="0.1",
     description="A terminal-based Minesweeper game.",  # Description of your project
     options={"build_exe": build_exe_options},
