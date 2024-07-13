@@ -182,7 +182,3 @@ class Minesweeper:
         self.mine_values[pos] = self.chr_flag  # Place the flag
         self.flags.add(pos)  # Add to flagged positions
         self.cat_check()
-
-# Example usage of Minesweeper class
-for i in Minesweeper((2, 2), 10).mine_values:
-    print(i)

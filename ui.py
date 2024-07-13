@@ -100,6 +100,7 @@ def display():
         for row in board:
             print(' '.join(str(cell) for cell in row))
 
+# Function to restart board play
 def restart():
     global grid, menu_screen, pos
     menu_screen = True
@@ -167,7 +168,7 @@ if __name__ == "__main__":
     menu: dict[str, str] = {
         "Start": "[enter] to start...",
         "Controls": "[wasd] OR [←↑↓→] to move\n[enter] to open box\n[f] to flag box",
-        "About": "we cool",
+        "About": "Schrodinger has placed a few of his beloved cats inside these mysterious boxes.\nThe uncertainty of whether they are alive or not weighs heavily on his mind.\nHis faith in you compels him to seek your assistance.\nAid Schrodinger in reuniting with his precious cats. Alive...",
         "Exit [esc]": "(ﾉ⚆_⚆)ﾉ"
     }
     pos: Pos = Pos((1, len(menu)))  # Initialize position for the menu
