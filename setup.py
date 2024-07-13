@@ -1,20 +1,20 @@
-from setuptools import setup, find_packages
+from cx_Freeze import setup, Executable
 
+# Define the main script of your application
+script = "main.py"
+
+# Define additional options if necessary
+build_exe_options = {
+    "packages": ["keyboard"],
+    "excludes": ["cx_Freeze", "cx_Logging", "lief", "setuptools", "wheel"],
+    "include_files": ["ui.py", "minesweeper.py"]
+}
+
+# Setup configuration
 setup(
     name="quantum-minesweeper",
     version="0.1",
-    packages=find_packages(),
-    include_package_data=True,
-    install_requires=[
-        "keyboard",
-    ],
-    entry_points={
-        "console_scripts": [
-            "quantum-minesweeper=main:main",
-        ],
-    },
-    package_data={
-        # Include additional files like ui.py and minesweeper.py
-        '': ['ui.py', 'minesweeper.py'],
-    },
+    description="A terminal-based Minesweeper game.",
+    options={"build_exe": build_exe_options},
+    executables=[Executable(script, base=None)]
 )
