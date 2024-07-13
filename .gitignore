@@ -1,0 +1,4 @@
+.venv/
+.vscode/
+simply.py
+__pycache__/
