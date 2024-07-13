@@ -3,15 +3,50 @@
 The OG game,
 but not the same.
 
-## Getting Started
+## Overview
+This is a terminal-based version of the classic Minesweeper game. The objective is to uncover all boxes without hitting a mine.
 
-These instructions will give you a copy of the project up and running on
-your local machine for your enjoyment.
+## Requirements
+- Python 3.x
+- `keyboard` module (will prompt for installation if not present)
 
-## Downloading the Game
-- Visit the repository link: [Your Repository Link](https://github.com/yourusername/minesweeper).
-- Click the green "Code" button and select "Download ZIP" to get all files.
-- Unzip
+## Installation
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd Minesweeper
+   ```
+
+2. **Install dependencies** (if not automatically installed):
+   ```bash
+   pip install keyboard
+   ```
+
+## Running the Game
+1. Navigate to the project directory:
+   ```bash
+   cd Minesweeper
+   ```
+
+2. Run the game:
+   ```bash
+   python main.py
+   ```
+
+---
+
+## Gameplay
+- The board consists of hidden boxes; some contain mines.
+- Uncover all boxes without hitting a mine to win.
+- If you hit a mine, the game ends, and all mines are revealed.
+
+## Controls
+- **Movement**: Use `W`, `A`, `S`, `D` or arrow keys to move around the board.
+- **Open a box**: Press `Enter` to uncover the selected box.
+- **Flag a box**: Press `F` to mark a box with a flag.
+- **Exit**: Press `Esc` to quit the game.
+
+---
 
 ## Authors
 
@@ -32,3 +67,5 @@ details
 
   - Minesweeper, a logic puzzle video game genre
   - Variants of Minesweeper
+
+---
