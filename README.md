@@ -53,8 +53,8 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
 
 ## Authors
 
-  - **TG**  -
-    [TG](https://github.com/ElektrikFire)
+  - **ElektrikFire**  -
+    [ElektrikFire](https://github.com/ElektrikFire)
 
 See also the list of
 [contributors](https://github.com/ElektrikFire/Minesweeper/graphs/contributors)
