@@ -16,7 +16,7 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
 ## Installation
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/ElektrikFire/Minesweeper.git
    cd Minesweeper
    ```
 
