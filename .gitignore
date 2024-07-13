@@ -1,4 +1,5 @@
+simply.py
 .venv/
 .vscode/
-simply.py
 __pycache__/
+build/
