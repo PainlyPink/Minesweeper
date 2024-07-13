@@ -1,4 +1,3 @@
-# Playing 
 # Minesweeper
 
 The OG game,
