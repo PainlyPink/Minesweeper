@@ -50,7 +50,7 @@ This is a terminal-based version of the classic Minesweeper game. The objective 
 
 ## Authors
 
-  - **TG** - *Provided README Template* -
+  - **TG**  -
     [TG](https://github.com/ElektrikFire)
 
 See also the list of
