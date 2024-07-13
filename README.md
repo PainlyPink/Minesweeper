@@ -6,16 +6,12 @@ but not the same.
 ## Getting Started
 
 These instructions will give you a copy of the project up and running on
-your local machine for development and testing purposes. See deployment
-for notes on deploying the project on a live system.
+your local machine for your enjoyment.
 
-### Prerequisites
-
-Requirements
-
-### Installing
-
-do this
+## Downloading the Game
+- Visit the repository link: [Your Repository Link](https://github.com/yourusername/minesweeper).
+- Click the green "Code" button and select "Download ZIP" to get all files.
+- Unzip
 
 ## Authors
 
