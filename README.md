@@ -4,7 +4,10 @@ The OG game,
 but not the same.
 
 ## Overview
-This is a terminal-based version of the classic Minesweeper game. The objective is to uncover all boxes without hitting a mine.
+This is a terminal-based variant of the classic Minesweeper game.
+
+### Variant Backstory
+Schrodinger has placed a few of his beloved cats inside these mysterious boxes. The uncertainty of whether they are alive or not weighs heavily on his mind. His faith in you compels him to seek your assistance. Aid Schrodinger in reuniting with his precious cats. Alive...
 
 ## Requirements
 - Python 3.x
