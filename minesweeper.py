@@ -68,6 +68,16 @@ class Minesweeper:
         from math import sqrt
         return sqrt((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)
 
+    def win(self):
+        # For every cell position
+        for i, j in ((i, j) for i in range(self.size[0]) for j in range(self.size[1])):
+            # If cell unrevealed and is not a mine
+            if self.mine_values[(i, j)] == self.chr_box:
+                if self.numbers[(i, j)] != -1:
+                    # ain't won yet
+                    return False
+        return True # yay
+    
     def set_mines(self, f_pos: tuple[int, int]):
         # Place mines on the board avoiding the first position and its neighbours
         from random import choice
@@ -129,6 +139,25 @@ class Minesweeper:
             self.mine_values[pos] = f' {self.numbers[pos]}'
         self.unboxed += 1  # Increment the count of revealed cells
 
+    def cat_check(self):
+        # If no flagged boxes, return
+        if not self.flags:
+            return
+        # Get every flagged position which is a mine
+        flagged = [pos for pos in self.flags if self.numbers[pos] == -1]
+        # For *every flagged position
+        for pos in flagged:
+            # For every neighbouring box positions
+            for npos in self.get_neighbours(pos):
+                # If the neighbouring box is not revealed
+                if self.mine_values[npos] == self.chr_box:
+                    # And if that box is not a mine
+                    if self.numbers[npos] != -1:
+                        break
+            else:
+                # Correct flagging
+                self.mine_values[pos] = '😺'
+
     def move(self, pos: tuple[int, int]):
         # Handle a move to a specific position
         if self.first:
@@ -140,11 +169,11 @@ class Minesweeper:
             self.show_mines()
             self.mine_values[pos] = '☠️ '
             self.over = True  # Set game over flag
-            return -1
+            return
         else:
             # Otherwise, reveal the cell
             self.reveal(pos)
-            return 0
+        self.cat_check()
 
     def flag(self, pos: tuple[int, int]):
         # Place or remove a flag on a cell
@@ -152,6 +181,7 @@ class Minesweeper:
             return -1
         self.mine_values[pos] = self.chr_flag  # Place the flag
         self.flags.add(pos)  # Add to flagged positions
+        self.cat_check()
 
 # Example usage of Minesweeper class
 for i in Minesweeper((2, 2), 10).mine_values:
