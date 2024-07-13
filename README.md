@@ -36,12 +36,28 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
    python main.py
    ```
 
+## OR
+
+### Running the executable:
+
+1. **Download the Game:**
+   - Go to the [Releases](https://github.com/ElektrikFire/Minesweeper/releases) page of the repository.
+   - Download the zipped build directory file (e.g., `build.zip`).
+
+2. **Extract the Zip File:**
+   - Extract the contents of the zip file to a directory on your computer.
+
+3. **Run the Game:**
+   - Navigate to the extracted directory.
+   - Open a terminal in this directory and run the executable (e.g., `main.exe` on Windows).
+
 ---
 
 ## Gameplay
-- The board consists of hidden boxes; some contain mines.
-- Uncover all boxes without hitting a mine to win.
-- If you hit a mine, the game ends, and all mines are revealed.
+
+- Explore a grid filled with hidden boxes, some of which are uncertain.
+- Your objective is to uncover all boxes without triggering any surprises to achieve victory.
+- If you encounter a surprise, the game concludes, in dismay.
 
 ## Controls
 - **Movement**: Use `W`, `A`, `S`, `D` or arrow keys to move around the board.
