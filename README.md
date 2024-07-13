@@ -4,7 +4,10 @@ The OG game,
 but not the same.
 
 ## Overview
-This is a terminal-based version of the classic Minesweeper game. The objective is to uncover all boxes without hitting a mine.
+This is a terminal-based variant of the classic Minesweeper game.
+
+### Variant Backstory
+Schrodinger has placed a few of his beloved cats inside these mysterious boxes. The uncertainty of whether they are alive or not weighs heavily on his mind. His faith in you compels him to seek your assistance. Aid Schrodinger in reuniting with his precious cats. Alive...
 
 ## Requirements
 - Python 3.x
@@ -13,7 +16,7 @@ This is a terminal-based version of the classic Minesweeper game. The objective 
 ## Installation
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/ElektrikFire/Minesweeper.git
    cd Minesweeper
    ```
 
@@ -50,8 +53,8 @@ This is a terminal-based version of the classic Minesweeper game. The objective 
 
 ## Authors
 
-  - **TG**  -
-    [TG](https://github.com/ElektrikFire)
+  - **ElektrikFire**  -
+    [ElektrikFire](https://github.com/ElektrikFire)
 
 See also the list of
 [contributors](https://github.com/ElektrikFire/Minesweeper/graphs/contributors)
