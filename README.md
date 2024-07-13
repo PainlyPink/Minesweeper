@@ -20,7 +20,7 @@ do this
 ## Authors
 
   - **TG** - *Provided README Template* -
-    [PurpleBooth](https://github.com/ElektrikFire)
+    [TG](https://github.com/ElektrikFire)
 
 See also the list of
 [contributors](https://github.com/ElektrikFire/Minesweeper/graphs/contributors)
