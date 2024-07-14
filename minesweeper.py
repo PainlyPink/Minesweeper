@@ -33,7 +33,7 @@ def clear():
 # Minesweeper game class
 class Minesweeper:
     def __init__(self, size: tuple[int, int] | tuple, mine_density: int) -> None:
-        # Initialize the Minesweeper game with given size and mine density
+        # Initialize the Minesweeper game with given size and mine density and other settings
         self.start_time = None
         self.over = False  # Game over flag
         self.size = size  # Board size
