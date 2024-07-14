@@ -1,8 +1,9 @@
 from minesweeper import Minesweeper  # Import the Minesweeper game
+from time import time, sleep
 
 # Class to manage the position on the board
 class Pos:
-    def __init__(self, board: tuple[int, int] = (9, 9)) -> None:
+    def __init__(self, board: tuple[int, int] | tuple = (9, 9)) -> None:
         # Initialize with default position and board size
         self.pos = (0, 0)  # Current position (x, y)
         self.board = board  # Board dimensions (width, height)
@@ -37,8 +38,8 @@ class Pos:
 
 # Class to manage colored text
 class Color:
-    def __init__(self, value) -> None:
-        self.value = value  # Text to be colored
+    def __init__(self, text) -> None:
+        self.text = text  # Text to be colored
 
     # Convert RGB to ANSI escape code for colored text
     def rgb(self, clr) -> str:
@@ -46,7 +47,7 @@ class Color:
             r, g, b = clr[4:-1].replace(',', '').split()
         else:
             r, g, b = clr
-        return f"\033[38;2;{r};{g};{b}m{self.value}\033[0m".strip()
+        return f"\033[38;2;{r};{g};{b}m{self.text}\033[0m".strip()
 
     # Predefined color methods
     def header(self) -> str: return self.rgb('rgb(54, 186, 152)')
@@ -65,7 +66,7 @@ def display():
     clear_screen()
     if menu_screen:
         # Display the menu
-        print(Color("\tWelcome!\n").header())
+        print(Color("\tWelcome to the Quantum Minesweeper! 🐈‍\n").header())
         for i, key in enumerate(menu):
             if pos[1] == i:
                 # Highlight the selected menu item
@@ -75,7 +76,19 @@ def display():
                 # Display other menu items
                 print(Color(key).other())
     else:
-        print(Color(f'Flags left: {grid.n_mines - len(grid.flags)}\t\tUnboxed: {grid.unboxed}\t\tPos: {pos}').desc())
+        elapsed_time = 0
+        if grid.start_time is not None:
+            elapsed_time = int(time() - grid.start_time)
+
+        header = Color(f'Flags left: {grid.n_mines - len(grid.flags)}\t\t\tElapsed time: {elapsed_time}s\n').desc()
+
+        # Calculate the number of spaces for indentation
+        header_width = len(header)
+        board_width = size[0] * 2 - 1
+        nspaces = (header_width - board_width) // 4
+        print(nspaces)
+            
+        print(f'{' ' * (-nspaces//2) if nspaces < 0 else ''}' + header)
         if grid.win():
             # From mines to happy cats 😺
             for mpos in grid.mine_pos:
@@ -94,13 +107,12 @@ def display():
         board = [row.copy() for row in grid.mine_values.matrix]
         # Show player position
         board[pos[1]][pos[0]] = '🕵️'
-        for dy in [-1, 0, 1]:
-            for dx in [-1, 0, 1]:
-                if (dx, dy) != (0, 0) and 0 <= pos[0] + dx < size[0] and 0 <= pos[1] + dy < size[1]:
-                    # Highlight surrounding cells
-                    board[pos[1] + dy][pos[0] + dx] = Color(board[pos[1] + dy][pos[0] + dx]).select()
+        # Highlight neighbouring positions
+        for npos in grid.get_neighbours(pos.pos):
+            board[npos[1]][npos[0]] = Color(board[npos[1]][npos[0]]).select()
+
         for row in board:
-            print(' '.join(str(cell) for cell in row))
+            print(f'{' ' * nspaces if nspaces > 0 else ''}' + ' '.join(str(cell) for cell in row))
 
 # Function to restart board play
 def restart():
@@ -108,8 +120,12 @@ def restart():
     menu_screen = True
     pos = Pos((1, len(menu)))
     grid = Minesweeper(size, 10)
-    input("Press [enter] to continue...")
+    sleep(0.2)
+    while True:
+        if keyboard.read_event(suppress=True).event_type == keyboard.KEY_UP:
+            break
     display()
+    sleep(0.2)
 
 # Function to handle the enter key action
 def enter():
@@ -160,6 +176,7 @@ def get_key():
 # Main function to initialize and start the game
 def main():
     display()
+    print(Color("Suppresses other key actions while running").rgb((255, 0, 0)))
     while True:
         get_key()
 
@@ -168,10 +185,10 @@ menu_screen: bool = True  # Flag to indicate if the menu is displayed
 menu: dict[str, str] = {
     "Start": "[enter] to start...",
     "Controls": "[wasd] OR [←↑↓→] to move\n[enter] to open box\n[f] to flag box",
-    "About": "Schrodinger has placed a few of his beloved cats inside these mysterious boxes.\nThe uncertainty of whether they are alive or not weighs heavily on his mind.\nHis faith in you compels him to seek your assistance.\nAid Schrodinger in reuniting with his precious cats. Alive...",
+    "About": "Schrodinger has placed a few of his beloved cats inside these mysterious boxes\nThe uncertainty of whether they are alive or not weighs heavily on his mind\nHis faith in you compels him to seek your assistance\nAid Schrodinger in reuniting with his precious cats. Alive...",
     "Exit [esc]": "(ﾉ⚆_⚆)ﾉ"
 }
 pos: Pos = Pos((1, len(menu)))  # Initialize position for the menu
-size = (9, 9)  # Set the board size
+size = (21,) * 2  # Set the board size
 grid: Minesweeper = Minesweeper(size, 10)  # Initialize the Minesweeper game
-main()  # Start the game
+# main()  # Start the game

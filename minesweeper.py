@@ -32,12 +32,12 @@ def clear():
 
 # Minesweeper game class
 class Minesweeper:
-    def __init__(self, size: tuple[int, int], mine_density: int) -> None:
+    def __init__(self, size: tuple[int, int] | tuple, mine_density: int) -> None:
         # Initialize the Minesweeper game with given size and mine density
+        self.start_time = None
         self.over = False  # Game over flag
         self.size = size  # Board size
         self.n_mines = max(1, size[0] * size[1] * mine_density // 100)  # Number of mines based on density
-        self.unboxed = 0  # Number of revealed cells
         self.numbers = Matrix2D(0, size)  # Matrix to store mine counts
         self.chr_box = '📦'  # Character for unrevealed cells
         self.chr_flag = '\033[31m ψ\033[0m'  # Character for flagged cells
@@ -50,6 +50,8 @@ class Minesweeper:
 
     def start(self, pos: tuple[int, int]):
         # Start the game by placing mines and setting values
+        from time import time
+        self.start_time = time()
         self.prev = pos  # Store the initial position
         self.set_mines(pos)  # Place mines avoiding the initial position
         self.set_values()  # Calculate the number of surrounding mines for each cell
@@ -137,7 +139,6 @@ class Minesweeper:
         else:
             # Otherwise, reveal the cell with the mine count
             self.mine_values[pos] = f' {self.numbers[pos]}'
-        self.unboxed += 1  # Increment the count of revealed cells
 
     def cat_check(self):
         # If no flagged boxes, return
