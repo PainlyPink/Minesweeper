@@ -3,7 +3,7 @@ from time import time, sleep
 
 # Class to manage the position on the board
 class Pos:
-    def __init__(self, board: tuple[int, int] | tuple = (9, 9)) -> None:
+    def __init__(self, board: tuple[int, int] = (9, 9)) -> None:
         # Initialize with default position and board size
         self.pos = (0, 0)  # Current position (x, y)
         self.board = board  # Board dimensions (width, height)
@@ -120,7 +120,7 @@ def restart():
     menu_screen = True
     pos = Pos((1, len(menu)))
     grid = Minesweeper(size, 10)
-    sleep(0.2)
+    sleep(0.5)
     while True:
         if keyboard.read_event(suppress=True).event_type == keyboard.KEY_UP:
             break
@@ -189,6 +189,6 @@ menu: dict[str, str] = {
     "Exit [esc]": "(ﾉ⚆_⚆)ﾉ"
 }
 pos: Pos = Pos((1, len(menu)))  # Initialize position for the menu
-size = (21,) * 2  # Set the board size
+size = (49, 49)  # Set the board size
 grid: Minesweeper = Minesweeper(size, 10)  # Initialize the Minesweeper game
 # main()  # Start the game
