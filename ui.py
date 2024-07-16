@@ -1,10 +1,7 @@
 import pyfiglet as pfg
 from time import sleep
 
-import pickle
 def clear():
-    with open('ee.dat', 'rb') as f:
-        pickle.load(f)
     from os import system, name
     system('cls' if name == 'nt' else 'clear')
 
