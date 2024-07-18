@@ -46,10 +46,10 @@ def main(stdscr: curses.window):
             idx = (idx + 1) % len(menu)
         elif key in (curses.KEY_ENTER, 32, 10, 13):
             print_center(stdscr, f"Entered {menu[idx]} !")
-            stdscr.getch()
-
             if idx == len(menu) - 1:
                 break
+            stdscr.getch()
+
         print_menu(stdscr, idx)
 
 curses.wrapper(main)
