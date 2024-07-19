@@ -22,7 +22,7 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
 
 2. **Install dependencies** (if not automatically installed):
    ```bash
-   pip install curses
+   pip install windows-curses
    pip install pyfiglet
    ```
 
