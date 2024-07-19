@@ -51,4 +51,4 @@ def check_and_install_keyboard(stdscr):
 if __name__ == "__main__":
     curses.wrapper(check_and_install_keyboard)
     from ui import main as ui_main
-    ui_main()  # Call the main function from ui.py
+    curses.wrapper(ui_main)  # Call the main function from ui.py
