@@ -22,7 +22,8 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
 
 2. **Install dependencies** (if not automatically installed):
    ```bash
-   pip install keyboard
+   pip install curses
+   pip install pyfiglet
    ```
 
 ## Running the Game
