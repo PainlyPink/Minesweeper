@@ -13,7 +13,7 @@ build_exe_options = {
 # Setup configuration
 setup(
     name="quantum-minesweeper",
-    version="0.1",
+    version="0.2",
     description="A terminal-based Minesweeper game.",
     options={"build_exe": build_exe_options},
     executables=[Executable(script, base=None)]
