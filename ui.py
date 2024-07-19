@@ -5,9 +5,9 @@ menu = ('Home', 'Play', 'Scoreboard', 'Exit')
 
 def init_colors():
     """initialize color pairs"""
-    curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_GREEN)
-    curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_MAGENTA)
-    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_WHITE)
+    curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
 
 def print_center(stdscr: curses.window, text: str):
     """prints text in center of screen"""
