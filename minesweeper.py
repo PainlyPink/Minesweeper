@@ -172,7 +172,6 @@ class Minesweeper: # Minesweeper game class
         # Check if the position is within bounds
         if not (0 <= pos[0] < self.size[0] and 0 <= pos[1] < self.size[1]):
             return -1
-
         # Check if the cell is already flagged, if there are enough flags, or if it's not a box cell
         if pos in self.flags or len(self.flags) >= self.n_mines or self.mine_values[pos] != self.chr_box:
             return -1
