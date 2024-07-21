@@ -1,17 +1,14 @@
 # Class to manage a 2D matrix
 class Matrix2D:
     def __init__(self, val, size: tuple[int, int]) -> None:
-        # Initialize a 2D matrix with a given value and size
+        # Initialize a 2D matrix with a given value and size and storing the size of it.
         self.matrix = [[val for _ in range(size[0])] for _ in range(size[1])]
-        self.size = size  # Store the size of the matrix
-
-    def __getitem__(self, pos):
-        # Get the value at the given position (x, y)
+        self.size = size  
+    def __getitem__(self, pos): # Get the value at the given position (x, y)
         x, y = pos
         return self.matrix[y][x]
 
-    def __setitem__(self, pos, value):
-        # Set the value at the given position (x, y)
+    def __setitem__(self, pos, value):  # Set the value at the given position (x, y)
         x, y = pos
         self.matrix[y][x] = value
 
@@ -19,21 +16,17 @@ class Matrix2D:
         # Return a string representation of the matrix
         return '\n'.join([' '.join(map(str, row)) for row in self.matrix])
 
-    def __iter__(self):
-        # Iterate over all values in the matrix
+    def __iter__(self): # Iterate over all values in the matrix
         for row in self.matrix:
             for value in row:
                 yield value
 
-# Function to clear the terminal screen
-def clear():
+def clear():# Function to clear the terminal screen
     from os import system, name
     system('cls' if name == 'nt' else 'clear')
 
-# Minesweeper game class
-class Minesweeper:
-    def __init__(self, size: tuple[int, int], mine_density: int) -> None:
-        # Initialize the Minesweeper game with given size and mine density and other settings
+class Minesweeper: # Minesweeper game class
+    def __init__(self, size: tuple[int, int], mine_density: int) -> None: # Initialize the Minesweeper game with given size and mine density and other settings
         self.start_time = None
         self.over = False  # Game over flag
         self.size = size  # Board size
@@ -48,8 +41,7 @@ class Minesweeper:
         self.revealed: set[tuple[int, int]] = set()  # Set to store revealed positions
         self.first = True  # Flag to check if the first move has been made
 
-    def start(self, pos: tuple[int, int]):
-        # Start the game by placing mines and setting values
+    def start(self, pos: tuple[int, int]): # Start the game by placing mines and setting values
         from time import time
         self.start_time = time()
         self.prev = pos  # Store the initial position
@@ -160,26 +152,34 @@ class Minesweeper:
                 self.mine_values[pos] = '😺'
 
     def move(self, pos: tuple[int, int]):
-        # Handle a move to a specific position
+    # Handle a move to a specific position
         if self.first:
             self.first = False  # Disable the first move flag
             self.start(pos)  # Start the game on the first move
-            return
+            return 
         if self.numbers[pos] == -1:
             # If the cell contains a mine, reveal all mines and end the game
             self.show_mines()
-            self.mine_values[pos] = '☠️ '
+            self.mine_values[pos] = '☠️'
             self.over = True  # Set game over flag
             return
-        else:
-            # Otherwise, reveal the cell
-            self.reveal(pos)
+    
+        # Otherwise, reveal the cell
+        self.reveal(pos)
         self.cat_check()
-
+    
     def flag(self, pos: tuple[int, int]):
-        # Place or remove a flag on a cell
-        if len(self.flags) >= self.n_mines or self.mine_values[pos] != self.chr_box or pos in self.flags or not (0 <= pos[0] < self.size[0] and 0 <= pos[1] < self.size[1]):
+        # Check if the position is within bounds
+        if not (0 <= pos[0] < self.size[0] and 0 <= pos[1] < self.size[1]):
             return -1
-        self.mine_values[pos] = self.chr_flag  # Place the flag
-        self.flags.add(pos)  # Add to flagged positions
+
+        # Check if the cell is already flagged, if there are enough flags, or if it's not a box cell
+        if pos in self.flags or len(self.flags) >= self.n_mines or self.mine_values[pos] != self.chr_box:
+        return -1
+
+        # Place the flag and add to flagged positions
+        self.mine_values[pos] = self.chr_flag
+        self.flags.add(pos)
+    
+        # Check the category
         self.cat_check()
