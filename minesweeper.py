@@ -175,7 +175,7 @@ class Minesweeper: # Minesweeper game class
 
         # Check if the cell is already flagged, if there are enough flags, or if it's not a box cell
         if pos in self.flags or len(self.flags) >= self.n_mines or self.mine_values[pos] != self.chr_box:
-        return -1
+            return -1
 
         # Place the flag and add to flagged positions
         self.mine_values[pos] = self.chr_flag
