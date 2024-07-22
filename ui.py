@@ -44,7 +44,10 @@ class MinesweeperMenu:
         except curses.error:
             self.stdscr.clear()
             self.print_center("256-color mode is not supported in this terminal.")
-            self.print_center("Proceeding without colors. Press any key to continue...", 1)
+            self.print_center("Proceeding with limited colors. Press any key to continue...", 1)
+            curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
+            curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_WHITE)
+            curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
             self.wait_for_key()
             return
 
@@ -74,7 +77,7 @@ class MinesweeperMenu:
 
         for opt, row in enumerate(self.menu):                
             x = w // 2 - 5
-            y = h // 2 - len(self.menu) + opt
+            y = h // 2 - len(self.menu) + opt + 3
             if opt == self.opt:
                 row = f'⟫ {row}'
                 self.stdscr.addstr(y, x, row, curses.color_pair(2))
@@ -103,7 +106,11 @@ class MinesweeperMenu:
             self.wait_for_key()
         elif self.opt == 2:
             self.stdscr.clear()
-            self.print_center("in About")
+            self.print_center("About", -2)
+            self.print_center("Schrodinger has placed a few of his beloved cats inside these mysterious boxes.")
+            self.print_center("The uncertainty of whether they are alive or not weighs heavily on his mind.", 1)
+            self.print_center("His faith in you compels him to seek your assistance.", 2)
+            self.print_center("Aid Schrodinger in reuniting with his precious cats. Alive...", 3)
             self.wait_for_key()
         elif self.opt == len(self.menu) - 1:  # Exit option
             exit()
