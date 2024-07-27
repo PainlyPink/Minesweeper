@@ -6,11 +6,18 @@ class MinesweeperMenu:
     def __init__(self, stdscr: curses.window):
         self.stdscr = stdscr
         self.menu = ('Play', 'Settings', 'About', 'Exit')
-        self.rgb_values = [
-            (208, 72, 72),
-            (254, 185, 65),
-            (231, 111, 81)
-        ]
+        self.rgb_values = {
+            "red": [
+                (208, 72, 72),
+                (254, 185, 65),
+                (220, 111, 81)
+            ],
+            "pur": [
+                (116, 105, 182),
+                (224, 174, 208),
+                (172, 135, 197)
+            ]
+        }
         self.opt = 0
 
     def get_256_colors(self):
@@ -52,7 +59,7 @@ class MinesweeperMenu:
             return
 
         pairs = []
-        for (r, g, b) in self.rgb_values:
+        for (r, g, b) in self.rgb_values['pur']:
             closest_color = self.find_closest_color(r, g, b, colors)
             pairs.append(closest_color)
 
