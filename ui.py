@@ -46,11 +46,11 @@ def on_enter(stdscr: curses.window):
     # menu = ('Play', 'Settings', 'About', 'Exit')
     if opt == 0:
         stdscr.clear()
-        print_center(stdscr, "in play")
+        print_center(stdscr, "Loading...'play' ")
         wait_for_key(stdscr)
     elif opt == 1:
         stdscr.clear()
-        print_center(stdscr, "in Settings")
+        print_center(stdscr, "In Settings")
         wait_for_key(stdscr)
     elif opt == 2:
         stdscr.clear()
