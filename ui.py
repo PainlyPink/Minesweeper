@@ -117,6 +117,7 @@ class MinesweeperMenu:
         if self.opt == 0:  # play
             self.stdscr.clear()
             self.print_center("in Play")
+            # real shi
             self.wait_for_key()
         
         elif self.opt == 1:  # settings
