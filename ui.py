@@ -7,22 +7,20 @@ class MinesweeperMenu:
         self.stdscr = stdscr
         self.menu = ('Play', 'Settings', 'About', 'Exit')
         self.color_themes = {
-            'red': [
+            'red': (
                 (208, 72, 72),
                 (254, 185, 65),
                 (220, 111, 81)
-            ],
-            'purple': [
+            ),
+            'purple': (
                 (116, 105, 182),
                 (224, 174, 208),
                 (172, 135, 197)
-            ]
+            )
         }
-        self.rgb_values = \
-            self.color_themes['red']\
-            + [(252, 220, 148)]\
-            + [(200, 207, 160)]\
-            + [(120, 171, 168)]  # header, unselected, selected
+        # header, selected, unselected
+        self.show_colors = ((252, 220, 148), (120, 171, 168), (200, 207, 160))
+        self.rgb_values = self.color_themes['red'] + self.show_colors
         self.opt = 0
         
         self.stdscr.nodelay(True)  # Continue even if no key is pressed
@@ -131,9 +129,9 @@ class MinesweeperMenu:
             while True:
                 for i in range(len(menu)):
                     if i == opt:
-                        self.print_center(f"⟫ {menu[i]}", -1 + i, 6, Xoffset)
+                        self.print_center(f"⟫ {menu[i]}", -1 + i, 5, Xoffset)
                     else:
-                        self.print_center(f"  {menu[i]}", -1 + i, 5, Xoffset)
+                        self.print_center(f"  {menu[i]}", -1 + i, 6, Xoffset)
                 self.stdscr.addstr(self.stdscr.getmaxyx()[0] - 1, 0, "Select theme with [enter] or [space]...")
 
                 key = self.stdscr.getch()
@@ -142,11 +140,7 @@ class MinesweeperMenu:
                 elif key in (curses.KEY_DOWN, 115):  # 115 is 's'
                     opt = (opt + 1) % len(menu)
                 elif key in (10, 32):  # Enter keys
-                    self.rgb_values = \
-                        self.color_themes[menu[opt]]\
-                        + [(252, 220, 148)]\
-                        + [(200, 207, 160)]\
-                        + [(120, 171, 168)]  # header, unselected, selected
+                    self.rgb_values = self.color_themes[menu[opt]] + self.show_colors
                     self.init_colors()
                     break
                 elif key == 27:
@@ -155,10 +149,10 @@ class MinesweeperMenu:
         elif self.opt == 2:  # about
             self.stdscr.clear()
             self.print_center("About", -6, 4)  # Using color pair 4 (magenta)
-            self.print_center("Schrodinger has placed a few of his beloved cats inside these mysterious boxes.", -3, 5)  # Using color pair 5 (cyan)
-            self.print_center("The uncertainty of whether they are alive or not weighs heavily on his mind.", -2, 5)
-            self.print_center("His faith in you compels him to seek your assistance.", -1, 5)
-            self.print_center("Aid Schrodinger in reuniting with his precious cats. Alive...", 0, 5)
+            self.print_center("Schrodinger has placed a few of his beloved cats inside these mysterious boxes.", -3, 6)  # Using color pair 5 (cyan)
+            self.print_center("The uncertainty of whether they are alive or not weighs heavily on his mind.", -2, 6)
+            self.print_center("His faith in you compels him to seek your assistance.", -1, 6)
+            self.print_center("Aid Schrodinger in reuniting with his precious cats. Alive...", 0, 6)
             self.wait_for_key()
         
         elif self.opt == len(self.menu) - 1:  # Exit option
