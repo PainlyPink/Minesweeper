@@ -33,7 +33,7 @@ class Minesweeper: # Minesweeper game class
         self.n_mines = max(1, size[0] * size[1] * mine_density // 100)  # Number of mines based on density
         self.numbers = Matrix2D(0, size)  # Matrix to store mine counts
         self.chr_box = '📦'  # Character for unrevealed cells
-        self.chr_flag = '\033[31m ψ\033[0m'  # Character for flagged cells
+        self.chr_flag = ' ψ'  # Character for flagged cells
         self.chr_bomb = '💀'  # Character for bombs
         self.mine_values = Matrix2D(self.chr_box, size)  # Matrix to store the display values
         self.mine_pos: set[tuple[int, int]] = set()  # Set to store mine positions
@@ -142,11 +142,9 @@ class Minesweeper: # Minesweeper game class
         for pos in flagged:
             # For every neighbouring box positions
             for npos in self.get_neighbours(pos):
-                # If the neighbouring box is not revealed
-                if self.mine_values[npos] == self.chr_box:
-                    # And if that box is not a mine
-                    if self.numbers[npos] != -1:
-                        break
+                # If the neighbouring box is not revealed or is flagged
+                if self.mine_values[npos] == self.chr_box or 'ψ' in self.mine_values[npos]:
+                    break
             else:
                 # Correct flagging
                 self.mine_values[pos] = '😺'
