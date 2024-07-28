@@ -1,6 +1,10 @@
 import curses
 import pyfiglet
 import numpy as np
+from minesweeper import Minesweeper
+
+class Game(Minesweeper):
+    pass
 
 class MinesweeperMenu:
     def __init__(self, stdscr: curses.window):
@@ -116,9 +120,7 @@ class MinesweeperMenu:
     def on_enter(self):
         if self.opt == 0:  # play
             self.stdscr.clear()
-            self.print_center("in Play")
-            # real shi
-            self.wait_for_key()
+            self.lets_game()
         
         elif self.opt == 1:  # settings
             self.stdscr.clear()
@@ -157,14 +159,21 @@ class MinesweeperMenu:
             self.wait_for_key()
         
         elif self.opt == len(self.menu) - 1:  # Exit option
-            self.game = False
+            self.is_game = False
+    
+    def lets_game(self):
+        """Play Minesweeper !"""
+        ms = Minesweeper((21, 21), 10)
+        pos = (0, 0)
+        while not ms.over:
+            pass
     
     def main(self):
         """Main game loop"""
         
-        self.game = True
+        self.is_game = True
         self.print_menu()
-        while self.game:
+        while self.is_game:
             key = self.stdscr.getch()
             if key == -1: continue
             
