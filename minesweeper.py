@@ -32,9 +32,11 @@ class Minesweeper: # Minesweeper game class
         self.size = size  # Board size
         self.n_mines = max(1, size[0] * size[1] * mine_density // 100)  # Number of mines based on density
         self.numbers = Matrix2D(0, size)  # Matrix to store mine counts
-        self.chr_box = '📦'  # Character for unrevealed cells
-        self.chr_flag = ' ψ'  # Character for flagged cells
-        self.chr_bomb = '💀'  # Character for bombs
+        self.chr_box = '\U0001F4E6' # Character for unrevealed cells
+        self.chr_flag = ' \u03C8' # Character for flagged cells (note: ψ is a Greek letter, not an emoji)
+        self.chr_bomb = '\U0001F480' # Character for bombs
+        self.chr_deathpos = '\u2620' # Character for position of bad reveal
+        self.chr_cat = '\U0001F63A' # cat
         self.mine_values = Matrix2D(self.chr_box, size)  # Matrix to store the display values
         self.mine_pos: set[tuple[int, int]] = set()  # Set to store mine positions
         self.flags: set[tuple[int, int]] = set()  # Set to store flagged positions
@@ -143,11 +145,14 @@ class Minesweeper: # Minesweeper game class
             # For every neighbouring box positions
             for npos in self.get_neighbours(pos):
                 # If the neighbouring box is not revealed or is flagged
-                if self.mine_values[npos] == self.chr_box or 'ψ' in self.mine_values[npos]:
+                if self.mine_values[npos] == self.chr_box:
+                    break
+                # Else if it is incorrectly flagged
+                elif self.mine_values[npos] == self.flag and self.mine_values[npos] != -1:
                     break
             else:
                 # Correct flagging
-                self.mine_values[pos] = '😺'
+                self.mine_values[pos] = self.chr_cat
 
     def move(self, pos: tuple[int, int]):
     # Handle a move to a specific position
@@ -158,7 +163,7 @@ class Minesweeper: # Minesweeper game class
         if self.numbers[pos] == -1:
             # If the cell contains a mine, reveal all mines and end the game
             self.show_mines()
-            self.mine_values[pos] = '☠️'
+            self.mine_values[pos] = self.chr_deathpos
             self.over = True  # Set game over flag
             return
     
