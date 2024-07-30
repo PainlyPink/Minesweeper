@@ -17,26 +17,28 @@ class Game:
         self.main()
 
     def main(self):
+        self.timer = True
         while True:
-            key = self.stdscr.getch()
-            if key == 27:  # Escape key to exit
-                self.stdscr.clear()
-                curses.wrapper(MinesweeperMenu)
-            elif key in (curses.KEY_UP, 119):  # 'w'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "UP")
-            elif key in (curses.KEY_DOWN, 115):  # 's'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "DOWN")
-            elif key in (curses.KEY_LEFT, 97):  # 'a'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "LEFT")
-            elif key in (curses.KEY_RIGHT, 100):  # 'd'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "RIGHT")
-            elif key in (curses.KEY_ENTER, 32, 10, 13):  # Space, Enter keys
-                self.stdscr.clear()
-                self.on_enter()
+            # key = self.stdscr.getch()
+            # if key == 27:  # Escape key to exit
+            #     self.stdscr.clear()
+            #     curses.wrapper(MinesweeperMenu)
+            # elif key in (curses.KEY_UP, 119):  # 'w'
+            #     self.stdscr.clear()
+            #     self.addstr(*self.CENTER, "UP")
+            # elif key in (curses.KEY_DOWN, 115):  # 's'
+            #     self.stdscr.clear()
+            #     self.addstr(*self.CENTER, "DOWN")
+            # elif key in (curses.KEY_LEFT, 97):  # 'a'
+            #     self.stdscr.clear()
+            #     self.addstr(*self.CENTER, "LEFT")
+            # elif key in (curses.KEY_RIGHT, 100):  # 'd'
+            #     self.stdscr.clear()
+            #     self.addstr(*self.CENTER, "RIGHT")
+            # elif key in (curses.KEY_ENTER, 32, 10, 13):  # Space, Enter keys
+            #     self.stdscr.clear()
+            #     self.on_enter()
+            self.display()
             self.stdscr.refresh()
     
     def on_enter(self):
@@ -64,6 +66,19 @@ class Game:
             exit()
         else:
             self.stdscr.refresh()
+
+    def display(self):
+        if self.timer:
+            self.addstr(*(0, 0), '{:.2f}'.format(time() - self.start_time), curses.color_pair(1))
+        if not self.board.over:
+            self.addstr(*(0, (self.board.size[0] * 3) // 2), self.happy_cat)
+        else:
+            self.addstr(*(0, (self.board.size[0] * 3) // 2), self.sad_cat)
+        self.addstr(*(0, self.board.size[0] * 3 - 2), str(len(self.board.flags)))
+        for y in range(self.board.size[1]):
+            for x in range(self.board.size[0]):
+                self.addstr(y + 1, x*3, self.board.mine_values[(x, y)])
+        self.stdscr.refresh()
 
 
 class MinesweeperMenu:
