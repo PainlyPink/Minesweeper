@@ -9,6 +9,8 @@ class Game:
         self.start_time = time()
         self.board = Minesweeper((21, 21), 10)
         self.stdscr = stdscr
+        self.stdscr.nodelay(True)  # Continue even if no key is pressed
+        self.stdscr.timeout(100)   # Wait 100ms before continuing
         self.timer = False
         self.happy_cat = '😺'
         self.sad_cat = '😿'
@@ -17,20 +19,25 @@ class Game:
     def main(self):
         while True:
             key = self.stdscr.getch()
-            if key == 27:  # 27 is the Escape key
-                curses.endwin()
-                curses.wrapper(start)
-            elif key in (curses.KEY_UP, 119):  # 119 is 'w'
+            if key == 27:  # Escape key to exit
+                self.stdscr.clear()
+                curses.wrapper(MinesweeperMenu)
+            elif key in (curses.KEY_UP, 119):  # 'w'
+                self.stdscr.clear()
                 self.addstr(*self.CENTER, "UP")
-            elif key in (curses.KEY_DOWN, 115):  # 115 is 's'
+            elif key in (curses.KEY_DOWN, 115):  # 's'
+                self.stdscr.clear()
                 self.addstr(*self.CENTER, "DOWN")
-            elif key in (curses.KEY_LEFT, 97):  # 97 is 'a'
+            elif key in (curses.KEY_LEFT, 97):  # 'a'
+                self.stdscr.clear()
                 self.addstr(*self.CENTER, "LEFT")
-            elif key in (curses.KEY_RIGHT, 100):  # 100 is 'd'
+            elif key in (curses.KEY_RIGHT, 100):  # 'd'
+                self.stdscr.clear()
                 self.addstr(*self.CENTER, "RIGHT")
             elif key in (curses.KEY_ENTER, 32, 10, 13):  # Space, Enter keys
+                self.stdscr.clear()
                 self.on_enter()
-            # self.wait_for_key()
+            self.stdscr.refresh()
     
     def on_enter(self):
         self.addstr(*self.CENTER, "Selected.")
@@ -57,23 +64,6 @@ class Game:
             exit()
         else:
             self.stdscr.refresh()
-    
-    def wait_for_key(self): 
-        while self.stdscr.getch() == -1:
-            continue
-    
-    def display(self):
-        if self.timer:
-            self.addstr(*(0, 0), '{:.2f}'.format(time() - self.start_time), curses.color_pair(1))
-        if not self.board.over:
-            self.addstr(*(0, (self.board.size[0] * 3) // 2), self.happy_cat)
-        else:
-            self.addstr(*(0, (self.board.size[0] * 3) // 2), self.sad_cat)
-        self.addstr(*(0, self.board.size[0] * 3 - 2), str(len(self.board.flags)))
-        for y in range(self.board.size[1]):
-            for x in range(self.board.size[0]):
-                self.addstr(y + 1, x*3, self.board.mine_values[(x, y)])
-        self.stdscr.refresh()
 
 
 class MinesweeperMenu:
@@ -100,7 +90,7 @@ class MinesweeperMenu:
         self.stdscr.nodelay(True)  # Continue even if no key is pressed
         self.stdscr.timeout(100)   # Wait 100ms before continuing
         curses.curs_set(0)
-        self.init_colors()
+        self.main()
 
     def init_colors(self):
         """Initialize color pairs using 256-color mode"""
@@ -236,7 +226,6 @@ class MinesweeperMenu:
     def lets_game(self):
         """Play Minesweeper !"""
         self.stdscr.clear()
-        curses.endwin()
         curses.wrapper(Game)
     
     def addstr(self, *args):
@@ -255,6 +244,7 @@ class MinesweeperMenu:
     def main(self):
         """Main game loop"""
         
+        self.init_colors()
         self.is_game = True
         self.print_menu()
         while self.is_game:
@@ -267,13 +257,12 @@ class MinesweeperMenu:
                 self.opt = (self.opt + 1) % len(self.menu)
             elif key in (curses.KEY_ENTER, 32, 10, 13):  # Space, Enter keys
                 self.on_enter()
+            if key == 27:  # Escape key to exit
+                self.is_game = False
             self.print_menu()
 
-def start(stdscr: curses.window):
-    menu = MinesweeperMenu(stdscr)
-    menu.main()
 
-curses.wrapper(start)
+curses.wrapper(MinesweeperMenu)
 curses.endwin()
 
 # Clear the terminal screen
