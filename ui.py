@@ -1,10 +1,80 @@
-import curses
-import pyfiglet
-import numpy as np
 from minesweeper import Minesweeper
+from pyfiglet import figlet_format
+from time import time, sleep
+import numpy as np
+import curses
 
-class Game(Minesweeper):
-    pass
+class Game:
+    def __init__(self, stdscr: curses.window) -> None:
+        self.start_time = time()
+        self.board = Minesweeper((21, 21), 10)
+        self.stdscr = stdscr
+        self.timer = False
+        self.happy_cat = '😺'
+        self.sad_cat = '😿'
+        self.main()
+
+    def main(self):
+        while True:
+            key = self.stdscr.getch()
+            if key == 27:  # 27 is the Escape key
+                curses.endwin()
+                curses.wrapper(start)
+            elif key in (curses.KEY_UP, 119):  # 119 is 'w'
+                self.addstr(*self.CENTER, "UP")
+            elif key in (curses.KEY_DOWN, 115):  # 115 is 's'
+                self.addstr(*self.CENTER, "DOWN")
+            elif key in (curses.KEY_LEFT, 97):  # 97 is 'a'
+                self.addstr(*self.CENTER, "LEFT")
+            elif key in (curses.KEY_RIGHT, 100):  # 100 is 'd'
+                self.addstr(*self.CENTER, "RIGHT")
+            elif key in (curses.KEY_ENTER, 32, 10, 13):  # Space, Enter keys
+                self.on_enter()
+            # self.wait_for_key()
+    
+    def on_enter(self):
+        self.addstr(*self.CENTER, "Selected.")
+    
+    @property
+    def CENTER(self):
+        return (self.h // 2, self.w // 2)
+    @property
+    def h(self):
+        return self.stdscr.getmaxyx()[0]
+    @property
+    def w(self):
+        return self.stdscr.getmaxyx()[1]
+    
+    def addstr(self, *args):
+        try:
+            self.stdscr.addstr(*args)
+        except curses.error:
+            curses.endwin()
+            CRED = '\033[91m'
+            CEND = '\033[0m'
+            print(CRED + "ERROR: The terminal window is too small." + CEND)
+            print(CRED + "Please increase the terminal size and restart the program." + CEND)
+            exit()
+        else:
+            self.stdscr.refresh()
+    
+    def wait_for_key(self): 
+        while self.stdscr.getch() == -1:
+            continue
+    
+    def display(self):
+        if self.timer:
+            self.addstr(*(0, 0), '{:.2f}'.format(time() - self.start_time), curses.color_pair(1))
+        if not self.board.over:
+            self.addstr(*(0, (self.board.size[0] * 3) // 2), self.happy_cat)
+        else:
+            self.addstr(*(0, (self.board.size[0] * 3) // 2), self.sad_cat)
+        self.addstr(*(0, self.board.size[0] * 3 - 2), str(len(self.board.flags)))
+        for y in range(self.board.size[1]):
+            for x in range(self.board.size[0]):
+                self.addstr(y + 1, x*3, self.board.mine_values[(x, y)])
+        self.stdscr.refresh()
+
 
 class MinesweeperMenu:
     def __init__(self, stdscr: curses.window):
@@ -82,14 +152,16 @@ class MinesweeperMenu:
         for i, color in enumerate(pairs, 1):
             curses.init_pair(i, color, curses.COLOR_BLACK)
 
-    def print_center(self, text, offset=0, color_pair=0, Xoffset=0):
+    def print_center(self, text, offset=0, color_pair=0, Xoffset=0, pos=None):
         """Prints text in the center of the screen"""
         h, w = self.stdscr.getmaxyx()
         x = w // 2 - len(text) // 2
         if Xoffset != 0:
             x = w // 2 - Xoffset
         y = h // 2
-        self.stdscr.addstr(y + offset, x, text, curses.color_pair(color_pair))
+        if pos != None:
+            x, y = pos
+        self.addstr(y + offset, x, text, curses.color_pair(color_pair))
         self.stdscr.refresh()
 
     def print_menu(self):
@@ -97,20 +169,20 @@ class MinesweeperMenu:
         self.stdscr.clear()
         h, w = self.stdscr.getmaxyx()
         
-        header = str(pyfiglet.figlet_format("* minesweeper *"))
+        header = str(figlet_format("* minesweeper *"))
         for i, line in enumerate(header.split('\n')):
-            self.stdscr.addstr(i + 1, w // 2 - len(line) // 2, line, curses.color_pair(1))
+            self.addstr(i + 1, w // 2 - len(line) // 2, line, curses.color_pair(1))
 
         for opt, row in enumerate(self.menu):                
             x = w // 2 - 5
             y = h // 2 - len(self.menu) + opt + 3
             if opt == self.opt:
                 row = f'⟫ {row}'
-                self.stdscr.addstr(y, x, row, curses.color_pair(2))
+                self.addstr(y, x, row, curses.color_pair(2))
             else:
-                self.stdscr.addstr(y, x, row, curses.color_pair(3))
+                self.addstr(y, x, row, curses.color_pair(3))
         
-        self.stdscr.addstr(h - 1, 0, "WASD or arrow keys to navigate...")
+        self.addstr(h - 1, 0, "WASD or arrow keys to navigate...")
         self.stdscr.refresh()
 
     def wait_for_key(self): 
@@ -135,7 +207,7 @@ class MinesweeperMenu:
                         self.print_center(f"⟫ {menu[i]}", -1 + i, 5, Xoffset)
                     else:
                         self.print_center(f"  {menu[i]}", -1 + i, 6, Xoffset)
-                self.stdscr.addstr(self.stdscr.getmaxyx()[0] - 1, 0, "Select theme with [enter] or [space]...")
+                self.addstr(self.stdscr.getmaxyx()[0] - 1, 0, "Select theme with [enter] or [space]...")
 
                 key = self.stdscr.getch()
                 if key in (curses.KEY_UP, 119):  # 119 is 'w'
@@ -163,10 +235,22 @@ class MinesweeperMenu:
     
     def lets_game(self):
         """Play Minesweeper !"""
-        ms = Minesweeper((21, 21), 10)
-        pos = (0, 0)
-        while not ms.over:
-            pass
+        self.stdscr.clear()
+        curses.endwin()
+        curses.wrapper(Game)
+    
+    def addstr(self, *args):
+        try:
+            self.stdscr.addstr(*args)
+        except curses.error:
+            curses.endwin()
+            CRED = '\033[91m'
+            CEND = '\033[0m'
+            print(CRED + "ERROR: The terminal window is too small." + CEND)
+            print(CRED + "Please increase the terminal size and restart the program." + CEND)
+            exit()
+        else:
+            self.stdscr.refresh()
     
     def main(self):
         """Main game loop"""
@@ -185,11 +269,12 @@ class MinesweeperMenu:
                 self.on_enter()
             self.print_menu()
 
-def start(stdscr):
+def start(stdscr: curses.window):
     menu = MinesweeperMenu(stdscr)
     menu.main()
 
 curses.wrapper(start)
+curses.endwin()
 
 # Clear the terminal screen
 from os import system, name
