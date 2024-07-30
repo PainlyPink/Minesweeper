@@ -22,6 +22,7 @@ class Game:
             if key == 27:  # Escape key to exit
                 self.stdscr.clear()
                 curses.wrapper(MinesweeperMenu)
+                return
             elif key in (curses.KEY_UP, 119):  # 'w'
                 self.stdscr.clear()
                 self.addstr(*self.CENTER, "UP")
