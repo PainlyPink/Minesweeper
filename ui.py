@@ -5,8 +5,9 @@ import numpy as np
 import curses
 
 class Game:
+    size, m_density = (21, 21), 10
     def __init__(self, stdscr: curses.window) -> None:
-        self.board = Minesweeper((21, 21), 10)
+        self.board = Minesweeper(Game.size, Game.m_density)
         self.keyset = {
             'esc': 27,
             'up': (curses.KEY_UP, 119),
@@ -18,33 +19,28 @@ class Game:
         self.stdscr = stdscr
         self.stdscr.nodelay(True)  # Continue even if no key is pressed
         self.stdscr.timeout(100)   # Wait 100ms before continuing
-        self.cpos = (0, 0)
+        # curses.curs_set(1)
+        self.cpos = self.Point((0, 0))
         self.happy_cat = '😺'
         self.sad_cat = '😿'
         
         self.main()
 
     def main(self):
-        while True:
-            key = self.stdscr.getch()
+        while (key := self.stdscr.getch()) != -1:
             if key == 27:  # Escape key to exit
                 self.stdscr.clear()
                 curses.wrapper(MinesweeperMenu)
             elif key in self.keyset['up']:  # 'w'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "UP")
+                self.cpos.move((0, -1))
             elif key in self.keyset['down']:  # 's'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "DOWN")
+                self.cpos.move((0, 1))
             elif key in self.keyset['left']:  # 'a'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "LEFT")
+                self.cpos.move((-1, 0))
             elif key in self.keyset['right']:  # 'd'
-                self.stdscr.clear()
-                self.addstr(*self.CENTER, "RIGHT")
+                self.cpos.move((1, 0))
             elif key in self.keyset['enter']:  # Space, Enter keys
-                self.stdscr.clear()
-                self.on_enter()
+                self.board.move(*self.cpos)
             self.display()
             self.stdscr.refresh()
     
@@ -55,8 +51,12 @@ class Game:
         def __init__(self, point) -> None:
             self.x = point[0]
             self.y = point[1]
-        def __repr__(self) -> tuple[int, int]:
-            return (self.x, self.y)
+        def __iter__(self):
+            yield self.x
+            yield self.y
+        def move(self, dpos):
+            self.x = (self.x + dpos[0]) % Game.size[0]
+            self.y = (self.y + dpos[1]) % Game.size[1]
     @property
     def CENTER(self):
         return (self.h // 2, self.w // 2)
