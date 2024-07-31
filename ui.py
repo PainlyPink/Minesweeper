@@ -1,6 +1,6 @@
 from minesweeper import Minesweeper
 from pyfiglet import figlet_format
-from time import time, sleep
+from time import time
 import numpy as np
 import curses
 
@@ -95,7 +95,48 @@ class MinesweeperMenu:
                 (116, 105, 182),
                 (224, 174, 208),
                 (172, 135, 197)
+            ),
+            'green': (
+                (26, 83, 25),
+                (8, 131, 149),
+                (80, 141, 78)
+            ),
+            'treamis': (
+               (7, 25, 82),
+               (119, 228, 200),
+               (235, 244, 246)
+            ),
+            'blue-green-white': (
+                (7, 25, 82),
+                (136, 214, 108),
+                (235, 244, 246)
+            ),
+            'blue-purple':(
+                (7, 25, 82),
+                (92, 47, 194),
+                (7, 25, 82)
+            ),
+            'orange-yellow':(
+                (235, 91, 0),
+                (255, 178, 0),
+                (255, 130, 37)
+            ),
+            'white-gray':(
+                (246, 241, 233),
+                (190, 198, 160),
+                (112, 136, 113)
+            ),
+            'teal':(
+                (179, 200, 207),
+                (190, 215, 220),
+                (8, 131, 149)
+            ),
+            'magma':(
+                (255, 0, 0),
+                (130, 3, 0),
+                (255, 165, 0)
             )
+
         }
         # header, selected, unselected
         self.show_colors = ((252, 220, 148), (120, 171, 168), (200, 207, 160))
