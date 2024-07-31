@@ -21,13 +21,9 @@ class Matrix2D:
             for value in row:
                 yield value
 
-def clear():# Function to clear the terminal screen
-    from os import system, name
-    system('cls' if name == 'nt' else 'clear')
 
 class Minesweeper: # Minesweeper game class
     def __init__(self, size: tuple[int, int], mine_density: int) -> None: # Initialize the Minesweeper game with given size and mine density and other settings
-        self.start_time = None
         self.over = False  # Game over flag
         self.size = size  # Board size
         self.n_mines = max(1, size[0] * size[1] * mine_density // 100)  # Number of mines based on density
@@ -144,7 +140,7 @@ class Minesweeper: # Minesweeper game class
         for pos in flagged:
             # For every neighbouring box positions
             for npos in self.get_neighbours(pos):
-                # If the neighbouring box is not revealed or is flagged
+                # If the neighbouring box is not revealed
                 if self.mine_values[npos] == self.chr_box:
                     break
                 # Else if it is incorrectly flagged

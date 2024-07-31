@@ -3,4 +3,5 @@ simply.py
 .vscode/
 __pycache__/
 build/
+info.txt
 *.zip

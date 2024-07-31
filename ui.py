@@ -6,44 +6,57 @@ import curses
 
 class Game:
     def __init__(self, stdscr: curses.window) -> None:
-        self.start_time = time()
         self.board = Minesweeper((21, 21), 10)
+        self.keyset = {
+            'esc': 27,
+            'up': (curses.KEY_UP, 119),
+            'down': (curses.KEY_DOWN, 115),
+            'left': (curses.KEY_LEFT, 97),
+            'right': (curses.KEY_RIGHT, 100),
+            'enter': (curses.KEY_ENTER, 32, 10, 13)
+        }
         self.stdscr = stdscr
         self.stdscr.nodelay(True)  # Continue even if no key is pressed
         self.stdscr.timeout(100)   # Wait 100ms before continuing
-        self.timer = False
+        self.cpos = (0, 0)
         self.happy_cat = '😺'
         self.sad_cat = '😿'
+        
         self.main()
 
     def main(self):
-        self.timer = True
         while True:
-            # key = self.stdscr.getch()
-            # if key == 27:  # Escape key to exit
-            #     self.stdscr.clear()
-            #     curses.wrapper(MinesweeperMenu)
-            # elif key in (curses.KEY_UP, 119):  # 'w'
-            #     self.stdscr.clear()
-            #     self.addstr(*self.CENTER, "UP")
-            # elif key in (curses.KEY_DOWN, 115):  # 's'
-            #     self.stdscr.clear()
-            #     self.addstr(*self.CENTER, "DOWN")
-            # elif key in (curses.KEY_LEFT, 97):  # 'a'
-            #     self.stdscr.clear()
-            #     self.addstr(*self.CENTER, "LEFT")
-            # elif key in (curses.KEY_RIGHT, 100):  # 'd'
-            #     self.stdscr.clear()
-            #     self.addstr(*self.CENTER, "RIGHT")
-            # elif key in (curses.KEY_ENTER, 32, 10, 13):  # Space, Enter keys
-            #     self.stdscr.clear()
-            #     self.on_enter()
+            key = self.stdscr.getch()
+            if key == 27:  # Escape key to exit
+                self.stdscr.clear()
+                curses.wrapper(MinesweeperMenu)
+            elif key in self.keyset['up']:  # 'w'
+                self.stdscr.clear()
+                self.addstr(*self.CENTER, "UP")
+            elif key in self.keyset['down']:  # 's'
+                self.stdscr.clear()
+                self.addstr(*self.CENTER, "DOWN")
+            elif key in self.keyset['left']:  # 'a'
+                self.stdscr.clear()
+                self.addstr(*self.CENTER, "LEFT")
+            elif key in self.keyset['right']:  # 'd'
+                self.stdscr.clear()
+                self.addstr(*self.CENTER, "RIGHT")
+            elif key in self.keyset['enter']:  # Space, Enter keys
+                self.stdscr.clear()
+                self.on_enter()
             self.display()
             self.stdscr.refresh()
     
     def on_enter(self):
         self.addstr(*self.CENTER, "Selected.")
     
+    class Point:
+        def __init__(self, point) -> None:
+            self.x = point[0]
+            self.y = point[1]
+        def __repr__(self) -> tuple[int, int]:
+            return (self.x, self.y)
     @property
     def CENTER(self):
         return (self.h // 2, self.w // 2)
@@ -68,13 +81,14 @@ class Game:
             self.stdscr.refresh()
 
     def display(self):
-        if self.timer:
-            self.addstr(*(0, 0), '{:.2f}'.format(time() - self.start_time), curses.color_pair(1))
+        # if not first move
+        if not self.board.first:
+            self.addstr(*(0, 0), '{:.2f}'.format(time() - self.board.start_time), curses.color_pair(3))
         if not self.board.over:
             self.addstr(*(0, (self.board.size[0] * 3) // 2), self.happy_cat)
         else:
             self.addstr(*(0, (self.board.size[0] * 3) // 2), self.sad_cat)
-        self.addstr(*(0, self.board.size[0] * 3 - 2), str(len(self.board.flags)))
+        self.addstr(*(0, self.board.size[0] * 3 - 2), str(len(self.board.flags)), curses.color_pair(3))
         for y in range(self.board.size[1]):
             for x in range(self.board.size[0]):
                 self.addstr(y + 1, x*3, self.board.mine_values[(x, y)])
