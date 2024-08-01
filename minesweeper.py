@@ -63,8 +63,8 @@ class Minesweeper: # Minesweeper game class
     def win(self):
         # For every cell position
         for i, j in ((i, j) for i in range(self.size[0]) for j in range(self.size[1])):
-            # If cell unrevealed and is not a mine
-            if self.mine_values[(i, j)] == self.chr_box:
+            # If cell unrevealed or flagged and is not a mine
+            if self.mine_values[(i, j)] in (self.chr_box, self.chr_flag):
                 if self.numbers[(i, j)] != -1:
                     # ain't won yet
                     return False
@@ -121,6 +121,8 @@ class Minesweeper: # Minesweeper game class
             return  # Stop if the position is already revealed
 
         self.revealed.add(pos)  # Mark the position as revealed
+        if pos in self.flags:
+            self.flags.remove(pos)
         if self.numbers[pos] == 0:
             # If the cell is empty, reveal it and its neighbours
             self.mine_values[pos] = ' 0'
@@ -149,6 +151,7 @@ class Minesweeper: # Minesweeper game class
             else:
                 # Correct flagging
                 self.mine_values[pos] = self.chr_cat
+                self.flags.remove(pos)
 
     def move(self, pos: tuple[int, int]):
     # Handle a move to a specific position
@@ -168,12 +171,14 @@ class Minesweeper: # Minesweeper game class
         self.cat_check()
     
     def flag(self, pos: tuple[int, int]):
-        # Check if the position is within bounds
-        if not (0 <= pos[0] < self.size[0] and 0 <= pos[1] < self.size[1]):
-            return -1
-        # Check if the cell is already flagged, if there are enough flags, or if it's not a box cell
-        if pos in self.flags or len(self.flags) >= self.n_mines or self.mine_values[pos] != self.chr_box:
-            return -1
+        # Check if there are enough flags, or if it's not a box cell
+        if len(self.flags) >= self.n_mines or not self.mine_values[pos] == self.chr_box:
+            if pos in self.flags:
+                self.flags.remove(pos)
+                self.mine_values[pos] = self.chr_box
+                return
+            else:
+                return
 
         # Place the flag and add to flagged positions
         self.mine_values[pos] = self.chr_flag
