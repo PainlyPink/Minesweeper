@@ -19,5 +19,8 @@ class sql:
         query = "INSERT INTO hat_tbl (win, time) VALUES (%s, %s)"
         self.mycur.execute(query, (win, time))
         self.mycon.commit()
+    
+    def load(self):
+        self.mycur.execute(f"SELECT * FROM {self.table}")
+        return self.mycur.fetchall()
 
-sql().save('N', '00:00:19')

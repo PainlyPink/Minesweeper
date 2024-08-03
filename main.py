@@ -5,7 +5,7 @@ import numpy as np
 import curses
 
 class Game:
-    size, m_density = (4, 4), 10
+    size, m_density = (21, 21), 10
 
     def __init__(self, stdscr: curses.window) -> None:
         self.stdscr = stdscr
@@ -76,6 +76,8 @@ class Game:
             self.addstr(*(0, 0), '{:.2f}s'.format(self.time), curses.color_pair(3))
             self.addstr(0, (self.board.size[0] * 3) // 2, self.sad_cat)
             self.addstr(*self.CENTER, "GAME OVER!!", curses.color_pair(1))
+            from sql import sql
+            sql().save('N', '{:.2f}'.format(self.time))
             self.gaming = False
             self.wait_for_key()
         self.stdscr.refresh()
@@ -132,7 +134,7 @@ class Game:
 class MinesweeperMenu:
     def __init__(self, stdscr: curses.window):
         self.stdscr = stdscr
-        self.menu = ('Play', 'Settings', 'About', 'Exit')
+        self.menu = ('Play', 'Settings', 'About', 'Saves', 'Exit')
         self.color_themes = {
             'red': (
                 (208, 72, 72),
@@ -323,6 +325,13 @@ class MinesweeperMenu:
             self.print_center("His faith in you compels him to seek your assistance.", -1, 6)
             self.print_center("Aid Schrodinger in reuniting with his precious cats. Alive...", 0, 6)
             self.wait_for_key()
+        
+        elif self.opt == 3:  # saves
+            with open('saves.txt', 'w') as f:
+                from sql import sql
+                f.writelines((str(row)+'\n' for row in sql().load()))
+            from os import startfile
+            startfile('saves.txt')
         
         elif self.opt == len(self.menu) - 1:  # Exit option
             self.is_game = False
