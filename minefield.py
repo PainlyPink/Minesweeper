@@ -1,3 +1,4 @@
+from os import system, name
 from typing import Generator
 
 import numpy as np
@@ -16,8 +17,8 @@ class Cell:
   """
 
   box = "?"
-  mine = "X"
-  flagged = "F"
+  mine = "\033[91mX\033[0m"
+  flagged = "\033[93mF\033[0m"
 
   def __init__(self, is_mine: bool = False) -> None:
     self.state = Cell.box
@@ -33,7 +34,7 @@ class Cell:
     if self.is_mine:
       self.state = Cell.mine
     else:
-      self.state = str(self.adjacent_mines)
+      self.state = "\033[96m" + str(self.adjacent_mines) + "\033[0m"
     return None
 
   def __str__(self) -> str:
@@ -104,9 +105,11 @@ class Minefield:
     self.victory = False
     self.flagged_count = 0
     self.revealed_count = 0
+    self.modified_count = 0
     self.total_safe_cells = (size[0] * size[1]) - mine_count
 
   def reveal(self, point: Point) -> None:
+    # TODO: better handle returns
     cell = self.field.cell_at(*point)
 
     # Reveal the cell, return if already revealed
@@ -115,9 +118,9 @@ class Minefield:
 
     # If it's a mine, game over
     if cell.is_mine:
-      self.victory = False
       return
 
+    self.modified_count += 1
     self.revealed_count += 1
 
     # Automatically reveal neighboring cells if no adjacent mines
@@ -137,6 +140,10 @@ class Minefield:
       self.reveal(neighbour_position)
       if neighbour_cell.adjacent_mines == 0:
         self.reveal_neighbors(neighbour_position)
+
+  def display(self):
+    print(self, self.modified_count, sep='\n')
+    self.modified_count = 0
 
   def flag(self, point: Point) -> None:
     cell = self.field.cell_at(*point)
@@ -188,17 +195,32 @@ def get_neighbors(point: Point, size: tuple[int, int]) -> Generator:
   yield from neighbor_cache[point]
 
 
+def generate_move() -> tuple[int, int]:
+  """Generate a random move within the Minefield dimensions."""
+  row = np.random.randint(101)
+  col = np.random.randint(101)
+  return (row, col)
+
+
 def main() -> None:
-  mf = Minefield((4, 4), 2)
+  mf = Minefield((101, 101), 1500)
+  moves: set[tuple[int, int]] = set()
+
   while not mf.victory:
-    command = input("Enter command (r for reveal, f for flag) and row and column: ").split()
-    if command[0] == 'r':
-      row, col = int(command[1]), int(command[2])
-      mf.reveal((row, col))
-    elif command[0] == 'f':
-      row, col = int(command[1]), int(command[2])
-      mf.flag((row, col))
-    print(mf)
+      # Generate a random move
+    move = generate_move()
+
+    # Check if the cell has already been revealed
+    if mf.field.cell_at(*move).is_revealed:
+      continue
+
+    moves.add(move)
+    mf.reveal(move)
+
+    # Print the updated state of the minefield
+    mf.display()
+    input("Press Enter to continue...")
+    system('cls' if name == 'nt' else 'clear')
 
   if mf.victory:
     print("YOU WIN!")
