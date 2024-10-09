@@ -11,7 +11,7 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
 
 ## Requirements
 - Python 3.x
-- `keyboard` module (will prompt for installation if not present)
+- TBA: [#20](https://github.com/ElektrikFire/Minesweeper/issues/20)
 
 ## Installation
 1. **Clone the repository**:
@@ -21,10 +21,7 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
    ```
 
 2. **Install dependencies** (if not automatically installed):
-   ```bash
-   pip install windows-curses
-   pip install pyfiglet
-   ```
+   TBA: [#20](https://github.com/ElektrikFire/Minesweeper/issues/20)
 
 ## Running the Game
 1. Navigate to the project directory:
@@ -41,6 +38,7 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
 
 ### Running the executable:
 
+[DEPRECATED] [#20](https://github.com/ElektrikFire/Minesweeper/issues/20)
 1. **Download the Game:**
    - Go to the [Releases](https://github.com/ElektrikFire/Minesweeper/releases) page of the repository.
    - Download the zipped build directory file (e.g., `build.zip`).
@@ -60,7 +58,7 @@ Schrodinger has placed a few of his beloved cats inside these mysterious boxes. 
 - Your objective is to uncover all boxes without triggering any surprises to achieve victory.
 - If you encounter a surprise, the game concludes, in dismay.
 
-## Controls
+## Controls(under work)
 - **Movement**: Use `W`, `A`, `S`, `D` or arrow keys to move around the board.
 - **Open a box**: Press `Enter` to uncover the selected box.
 - **Flag a box**: Press `F` to mark a box with a flag.
@@ -79,9 +77,7 @@ who participated in this project.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE)
-MIT License - see the [LICENSE.md](LICENSE) file for
-details
+TBA: [#20](https://github.com/ElektrikFire/Minesweeper/issues/20)
 
 ## Acknowledgments
 

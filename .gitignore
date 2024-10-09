@@ -1,7 +1,1 @@
-simply.py
-.venv/
-.vscode/
-__pycache__/
-build/
-info.txt
-*.zip
+.**

@@ -1,8 +1,0 @@
-(1, 'N', datetime.timedelta(seconds=19))
-(2, 'N', datetime.timedelta(seconds=19))
-(3, 'Y', datetime.timedelta(seconds=2))
-(4, 'Y', datetime.timedelta(0))
-(5, 'N', datetime.timedelta(seconds=19))
-(6, 'N', datetime.timedelta(seconds=19))
-(7, 'Y', datetime.timedelta(0))
-(8, 'N', datetime.timedelta(seconds=49))
