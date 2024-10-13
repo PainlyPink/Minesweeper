@@ -53,8 +53,7 @@ class Cell:
 
   def reveal(self) -> None:
     """Reveal the cell."""
-    if not self.is_flagged:  # Can't reveal a flagged cell
-      self.is_revealed = True
+    self.is_revealed = True
 
   def visual(self, visuals: Visuals) -> str:
     """Return a visual representation of the cell."""
@@ -63,6 +62,12 @@ class Cell:
     if self.is_mine:
       return visuals.mine
     return str(self.adjacent_mines) if self.adjacent_mines > 0 else visuals.empty
+
+  def __str__(self):
+    string = self.visual(Visuals())
+    string += f"\nis_mine: {self.is_mine}, is_revealed: {self.is_revealed}"
+    string += f"\nis_flagged: {self.is_flagged}, adjacent_mines: {self.adjacent_mines}"
+    return string
 
 
 class Buffer:
@@ -80,7 +85,7 @@ class Buffer:
         for y in range(self.size.rows)
     ]
 
-  def update(self, field: dict[Point, Cell], modified_points: set[Point]) -> None:
+  def update(self, field: dict[Point, Cell], modified_points: list[Point]) -> None:
     """Update only the modified cells in the buffer."""
     for point in modified_points:
       self.buffer[point.y][point.x] = field[point].visual(self.visuals)
