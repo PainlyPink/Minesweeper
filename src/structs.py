@@ -1,5 +1,14 @@
 from dataclasses import dataclass
 
+from exceptions import ItemInListError
+
+
+class DistinctList(list):
+  def append(self, item):
+    if item in self:
+      raise ItemInListError(f"Item `{item}` already exists in list.")
+    super().append(item)
+
 
 @dataclass(frozen=True)
 class Point:
@@ -85,15 +94,17 @@ class Buffer:
         for y in range(self.size.rows)
     ]
 
-  def update(self, field: dict[Point, Cell], modified_points: list[Point]) -> None:
+  def update(self, field: dict[Point, Cell], modified_points: list[Point]) -> "Buffer":
     """Update only the modified cells in the buffer."""
     for point in modified_points:
       self.buffer[point.y][point.x] = field[point].visual(self.visuals)
+    return self
 
-  def display(self) -> None:
+  def display(self) -> "Buffer":
     """Display the current buffer."""
     for row in self.buffer:
       print(" ".join(row))
+    return self
 
   def cell_at(self, point: Point) -> str:
     """Retrieve the visual of a cell at a specific point."""

@@ -1,13 +1,11 @@
-import logging
-from os import system as os_system, name as os_name
+# from os import system as os_system, name as os_name
 from functools import lru_cache
 from random import sample
-from exceptions import *
+from exceptions import *  # pylint: disable=unused-wildcard-import
 
-from structs import Size, Point, Cell, Buffer, Visuals
+from structs import Buffer, Size, Point, Cell, DistinctList, Visuals
 
 
-logging.basicConfig(level=logging.DEBUG)
 FIELD_SIZE = Size(10, 10)
 
 
@@ -15,8 +13,8 @@ class Minefield:
   def __init__(self, size: Size, mine_count: int, boom_point: Point) -> None:
     self.size = size
     self.flagged_count = 0
-    self.revealed: list[Point] = []
-    self.mine_points: list[Point] = []
+    self.revealed = DistinctList()
+    self.mine_points = DistinctList()
     self.total_safe_cells = self.size.cells - mine_count
     self.setup(mine_count, boom_point)
 
@@ -37,11 +35,11 @@ class Minefield:
 
     return field
 
-  def _calculate_safe_zone(self, boom_point: Point) -> list[Point]:
+  def _calculate_safe_zone(self, boom_point: Point) -> DistinctList:
     """Calculate the initial safe zone around the first click point."""
     return get_neighbors(boom_point, self.size, include_self=True, extent=1)
 
-  def _populate_field(self, mine_count: int, safe_zone: list[Point]) -> tuple[dict[Point, Cell], list[Point]]:
+  def _populate_field(self, mine_count: int, safe_zone: list[Point]) -> tuple[dict[Point, Cell], list]:
     """
     Populate the minefield with mines and non-mine cells.
     Returns:
@@ -76,7 +74,7 @@ class Minefield:
 
     return field, mine_neighbors
 
-  def _count_adjacent_mines(self, field: dict[Point, Cell], mine_neighbors: list[Point]) -> None:
+  def _count_adjacent_mines(self, field: dict[Point, Cell], mine_neighbors: list) -> None:
     """
     Count the number of mines around each cell and update their `adjacent_mines` attribute.
     """
@@ -93,8 +91,6 @@ class Minefield:
 
     self.revealed.append(point)
     (cell := self.cell_at(point)).reveal()
-
-    logging.debug(f"Revealed {point}: {cell.visual(Visuals())}")
 
     # Automatically reveal neighboring cells if no adjacent mines
     if cell.adjacent_mines == 0:
@@ -124,25 +120,36 @@ class Minefield:
   def cell_at(self, point: Point) -> Cell:
     if point not in self.field:
       raise NotInFieldError
+
     return self.field[point]
 
 
 @lru_cache(maxsize=FIELD_SIZE.cells)
-def get_neighbors(point: Point, size: Size, include_self=False, extent: int = 1) -> list[Point]:
+def get_neighbors(point: Point, size: Size, include_self=False, extent: int = 1) -> DistinctList:
   """Generate and cache all neighboring coordinates for a given point in a grid."""
 
   neighbor_range = range(-extent, extent + 1)
   offsets = tuple(Point(x, y) for x in neighbor_range for y in neighbor_range if (x, y) != (0, 0))
 
-  neighbors = [
+  neighbors = DistinctList(
       neighbor_point
       for offset in offsets
       if (neighbor_point := point + offset).is_within(size)
-  ]
+  )
 
   if include_self:
     neighbors.append(point)
   return neighbors
 
 
-Minefield(FIELD_SIZE, 10, Point(4, 4)).reveal(Point(0, 0))
+def main():
+  mf = Minefield(FIELD_SIZE, 10, Point(4, 4))
+  bf = Buffer(mf.field, FIELD_SIZE, Visuals()).display()
+  i = len(mf.revealed)
+  mf.reveal(Point(0, 0))
+  print("=" * 80)
+  bf.update(mf.field, mf.revealed[i:]).display()
+
+
+if __name__ == "__main__":
+  main()
