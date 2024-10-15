@@ -60,9 +60,10 @@ class Cell:
     if not self.is_revealed:  # Can't flag a revealed cell
       self.is_flagged = not self.is_flagged
 
-  def reveal(self) -> None:
+  def reveal(self) -> "Cell":
     """Reveal the cell."""
     self.is_revealed = True
+    return self
 
   def visual(self, visuals: Visuals) -> str:
     """Return a visual representation of the cell."""

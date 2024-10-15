@@ -1,24 +1,37 @@
-# from os import system as os_system, name as os_name
+from os import system as os_system, name as os_name
 from functools import lru_cache
+from collections import deque
 from random import sample
-from exceptions import *  # pylint: disable=unused-wildcard-import
 
 from structs import Buffer, Size, Point, Cell, DistinctList, Visuals
+from exceptions import *  # pylint: disable=unused-wildcard-import
 
 
-FIELD_SIZE = Size(10, 10)
+FIELD_SIZE = Size(80, 80)
+DIFFICULTY = 9
+
+
+def validate_point(func):
+  def wrapper(self, point: Point) -> Point:
+    if point in self.revealed:
+      raise CellAlreadyRevealedError
+    if point in self.mine_points:
+      raise MineHitError
+
+    return func(self, point)
+  return wrapper
 
 
 class Minefield:
   def __init__(self, size: Size, mine_count: int, boom_point: Point) -> None:
     self.size = size
     self.flagged_count = 0
-    self.revealed = DistinctList()
-    self.mine_points = DistinctList()
-    self.total_safe_cells = self.size.cells - mine_count
-    self.setup(mine_count, boom_point)
 
-  def setup(self, mine_count: int, boom_point: Point) -> None:
+    self.revealed = DistinctList()
+    self.mine_points: set[Point] = set()
+
+    self.total_safe_cells = self.size.cells - mine_count
+
     self.field: dict[Point, Cell] = self.generate_field(mine_count, boom_point)
     self.reveal(boom_point)
 
@@ -35,9 +48,12 @@ class Minefield:
 
     return field
 
-  def _calculate_safe_zone(self, boom_point: Point) -> DistinctList:
+  def _calculate_safe_zone(self, boom_point: Point) -> list[Point]:
     """Calculate the initial safe zone around the first click point."""
-    return get_neighbors(boom_point, self.size, include_self=True, extent=1)
+    extent = max(1, FIELD_SIZE.cells >> DIFFICULTY)  # x >> n == x // 2ⁿ
+    safe_zone = get_neighbors(boom_point, self.size, include_self=True, extent=extent)
+
+    return safe_zone
 
   def _populate_field(self, mine_count: int, safe_zone: list[Point]) -> tuple[dict[Point, Cell], list]:
     """
@@ -67,8 +83,10 @@ class Minefield:
         # Assign a mine or non-mine based on the precomputed random list
         is_mine = mine_or_not[mine_index]
         if is_mine:
-          self.mine_points.append(point)
+          self.mine_points.add(point)
           mine_neighbors.extend(get_neighbors(point, self.size))
+
+        # Add the cell to the field
         field[point] = Cell(is_mine)
         mine_index += 1
 
@@ -82,29 +100,34 @@ class Minefield:
       if point in field:
         field[point].adjacent_mines += 1
 
+  @validate_point
   def reveal(self, point: Point) -> None:
-    if point in self.revealed:
-      raise CellAlreadyRevealedError
-
-    if point in self.mine_points:
-      raise MineHitError
-
-    self.revealed.append(point)
     (cell := self.cell_at(point)).reveal()
+    self.revealed.append(point)
 
     # Automatically reveal neighboring cells if no adjacent mines
     if cell.adjacent_mines == 0:
       self.reveal_neighbors(point)
 
-  def reveal_neighbors(self, point: Point) -> None:
+  def reveal_neighbors(self, start_point: Point) -> None:
     """
-    Iteratively reveal all neighboring cells around a given point.
+    Iteratively reveal all neighboring cells around a given point using a breadth-first approach.
+    This avoids hitting the recursion limit by using a queue for the iterative reveal process.
     """
-    for neighbor in get_neighbors(point, self.size):
-      if neighbor in self.revealed or neighbor in self.mine_points:
-        continue
+    queue = deque([start_point])
 
-      self.reveal(neighbor)
+    while queue:
+      point = queue.popleft()
+
+      for neighbor in get_neighbors(point, self.size, exclude=(*self.revealed, *self.mine_points)):
+        print(neighbor)
+        cell = self.cell_at(neighbor)
+
+        cell.reveal()
+        self.revealed.append(neighbor)
+
+        if cell.adjacent_mines == 0:
+          queue.append(neighbor)
 
   def flag(self, point: Point) -> None:
     if point in self.revealed:
@@ -112,6 +135,13 @@ class Minefield:
 
     (cell := self.cell_at(point)).flag()
     self.flagged_count += 1 if cell.is_flagged else -1
+    if not cell.is_mine:
+      return
+
+    if cell.is_flagged:
+      self.revealed.append(point)
+    else:
+      self.revealed.remove(point)
 
   def is_victory(self) -> bool:
     return len(self.revealed) == self.total_safe_cells
@@ -120,22 +150,24 @@ class Minefield:
   def cell_at(self, point: Point) -> Cell:
     if point not in self.field:
       raise NotInFieldError
-
     return self.field[point]
 
 
 @lru_cache(maxsize=FIELD_SIZE.cells)
-def get_neighbors(point: Point, size: Size, include_self=False, extent: int = 1) -> DistinctList:
+def get_neighbors(
+    point: Point, size: Size, exclude: tuple = tuple(), include_self=False, extent: int = 1
+) -> list[Point]:
   """Generate and cache all neighboring coordinates for a given point in a grid."""
 
   neighbor_range = range(-extent, extent + 1)
   offsets = tuple(Point(x, y) for x in neighbor_range for y in neighbor_range if (x, y) != (0, 0))
 
-  neighbors = DistinctList(
+  neighbors = [
       neighbor_point
       for offset in offsets
       if (neighbor_point := point + offset).is_within(size)
-  )
+      and neighbor_point not in exclude
+  ]
 
   if include_self:
     neighbors.append(point)
@@ -143,12 +175,28 @@ def get_neighbors(point: Point, size: Size, include_self=False, extent: int = 1)
 
 
 def main():
-  mf = Minefield(FIELD_SIZE, 10, Point(4, 4))
+  def move(prompt: str = "Move: ") -> tuple:
+    inp = input(prompt).strip().split()
+    p = Point(*map(int, inp[1:3]))
+    t = inp[0]
+    return t, p
+
+  mf = Minefield(FIELD_SIZE, 2000, move("Start: ")[1])
   bf = Buffer(mf.field, FIELD_SIZE, Visuals()).display()
-  i = len(mf.revealed)
-  mf.reveal(Point(0, 0))
-  print("=" * 80)
-  bf.update(mf.field, mf.revealed[i:]).display()
+
+  while not mf.is_victory():
+    t, p = move()
+    os_system("clear" if os_name == "posix" else "cls")
+
+    if t == "f":
+      mf.flag(p)
+      modified = [p]
+    else:
+      i = len(mf.revealed)
+      mf.reveal(p)
+      modified = mf.revealed[i:]
+
+    bf.update(mf.field, modified).display()
 
 
 if __name__ == "__main__":

@@ -16,3 +16,7 @@ class FlaggingRevealedCellError(CellAlreadyRevealedError):
 
 class ItemInListError(ValueError):
   """Raised when an item is already in the distinct list."""
+
+
+class NoMoreFlagsError(RuntimeError):
+  """Raised when a player attempts to flag a cell without any flags."""
