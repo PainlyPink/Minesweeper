@@ -1,4 +1,4 @@
-# Minesweeper
+# Minesweeper [WIP]
 
 The OG game,
 but not the same.
