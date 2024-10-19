@@ -1,109 +1,90 @@
 from os import system as os_system, name as os_name
-from functools import lru_cache
 from collections import deque
 from random import sample
 
-from structs import Buffer, Size, Point, Cell, DistinctList, Visuals
-from exceptions import *  # pylint: disable=unused-wildcard-import
+from structs import Buffer, Size, Point, Cell, DistinctList, Visuals, Count, CellTypes
+from exceptions import *
 
 
-FIELD_SIZE = Size(80, 80)
+FIELD_SIZE = Size(10, 13)
 DIFFICULTY = 9
+EXTENT = max(1, FIELD_SIZE.cells >> DIFFICULTY)  # x >> n == x // 2ⁿ
 
 
-def validate_point(func):
-  def wrapper(self, point: Point) -> Point:
-    if point in self.revealed:
-      raise CellAlreadyRevealedError
-    if point in self.mine_points:
-      raise MineHitError
+def validate_point(check_bounds=True, check_revealed=False, check_mines=False, check_flagged=False):
+  def decorator(func):
+    def wrapper(self, point: Point, *args, **kwargs) -> Point:
 
-    return func(self, point)
-  return wrapper
+      if check_bounds and not point.is_within(self.size):
+        raise NotInFieldError
+      if check_revealed and point in self.cells.revealed:
+        raise CellAlreadyRevealedError
+      if check_mines and point in self.cells.mines:
+        raise MineHitError
+      if check_flagged and point in self.cells.flagged:
+        raise CellAlreadyFlaggedError
+
+      return func(self, point, *args, **kwargs)
+    return wrapper
+  return decorator
 
 
 class Minefield:
-  def __init__(self, size: Size, mine_count: int, boom_point: Point) -> None:
+
+  def __init__(self, size: Size, mine_density: int) -> None:
     self.size = size
-    self.flagged_count = 0
 
-    self.revealed = DistinctList()
-    self.mine_points: set[Point] = set()
+    mine_count = self.size.cells * mine_density // 100
+    safe_count = self.size.cells - mine_count
+    self.count = Count(
+        mines=mine_count,
+        safe=safe_count,
+        flagged=0
+    )
 
-    self.total_safe_cells = self.size.cells - mine_count
+    self.cells = CellTypes(
+        revealed=DistinctList(),
+        mines=DistinctList(),
+        flagged=DistinctList()
+    )
 
-    self.field: dict[Point, Cell] = self.generate_field(mine_count, boom_point)
-    self.reveal(boom_point)
+    self.field = self.set_field()
+    self.neighbors = self.set_neighbors()
 
-  def generate_field(self, mine_count: int, boom_point: Point) -> dict[Point, Cell]:
-    """Generate the minefield as a dictionary of points and cells."""
-    # Step 1: Define safe zone
-    safe_zone = self._calculate_safe_zone(boom_point)
+  def set_field(self) -> dict[Point, Cell]:
+    points = ((x, y) for x in range(self.size.cols) for y in range(self.size.rows))
+    return {Point(*point): Cell() for point in points}
 
-    # Step 2: Create the minefield structure
-    field, mine_neighbors = self._populate_field(mine_count, safe_zone)
+  def set_neighbors(self) -> dict[Point, list[Point]]:
+    return {point: self.calculate_neighbors(point) for point in self.field}
 
-    # Step 3: Count adjacent mines and update cells
-    self._count_adjacent_mines(field, mine_neighbors)
+  @validate_point(check_bounds=True)
+  def boom(self, point: Point) -> None:
+    safe_zone = self.calculate_neighbors(point, extent=EXTENT)
+    mine_points = self.generate_mine_points(set(safe_zone) | {point})
 
-    return field
+    self.set_mines(mine_points)
+    self.reveal(point)
 
-  def _calculate_safe_zone(self, boom_point: Point) -> list[Point]:
-    """Calculate the initial safe zone around the first click point."""
-    extent = max(1, FIELD_SIZE.cells >> DIFFICULTY)  # x >> n == x // 2ⁿ
-    safe_zone = get_neighbors(boom_point, self.size, include_self=True, extent=extent)
+  def generate_mine_points(self, safe_zone: set[Point]) -> list[Point]:
+    field = set(self.field)
 
-    return safe_zone
+    return sample(tuple(field.difference(safe_zone)), k=self.count.mines)
 
-  def _populate_field(self, mine_count: int, safe_zone: list[Point]) -> tuple[dict[Point, Cell], list]:
-    """
-    Populate the minefield with mines and non-mine cells.
-    Returns:
-        - A dictionary representing the field (Point -> Cell)
-        - A list of neighboring points to all mines, used for mine counting.
-    """
-    total_cells = self.size.cells
-    unsafe_region = total_cells - len(safe_zone)
+  def set_mines(self, mine_points: list[Point]) -> None:
+    for mine_point in mine_points:
+      self.cell_at(mine_point).is_mine = True
+      self.cells.mines.append(mine_point)
+      self.increment_mine_neighbors(mine_point)
 
-    # Generate random True/False values for mine placement
-    mine_or_not = sample([True] * mine_count + [False] * (unsafe_region - mine_count), k=unsafe_region)
+  def increment_mine_neighbors(self, point: Point) -> None:
+    for neighbor in self.neighbors_of(point):
+      self.cell_at(neighbor).adjacent_mines += 1
 
-    field = {}
-    mine_neighbors: list[Point] = []
-    mine_index = 0
-
-    # Populate the field with mines and non-mines
-    for position in range(total_cells):
-      point = Point(*divmod(position, self.size.rows))
-
-      # If point is in the safe zone, it's not a mine
-      if point in safe_zone:
-        field[point] = Cell(is_mine=False)
-      else:
-        # Assign a mine or non-mine based on the precomputed random list
-        is_mine = mine_or_not[mine_index]
-        if is_mine:
-          self.mine_points.add(point)
-          mine_neighbors.extend(get_neighbors(point, self.size))
-
-        # Add the cell to the field
-        field[point] = Cell(is_mine)
-        mine_index += 1
-
-    return field, mine_neighbors
-
-  def _count_adjacent_mines(self, field: dict[Point, Cell], mine_neighbors: list) -> None:
-    """
-    Count the number of mines around each cell and update their `adjacent_mines` attribute.
-    """
-    for point in mine_neighbors:
-      if point in field:
-        field[point].adjacent_mines += 1
-
-  @validate_point
+  @validate_point(check_bounds=True, check_revealed=True, check_mines=True)
   def reveal(self, point: Point) -> None:
     (cell := self.cell_at(point)).reveal()
-    self.revealed.append(point)
+    self.cells.revealed.append(point)
 
     # Automatically reveal neighboring cells if no adjacent mines
     if cell.adjacent_mines == 0:
@@ -119,70 +100,67 @@ class Minefield:
     while queue:
       point = queue.popleft()
 
-      for neighbor in get_neighbors(point, self.size, exclude=(*self.revealed, *self.mine_points)):
-        print(neighbor)
+      safe_to_reveal = lambda point: (cell := self.cell_at(point)).is_revealed == cell.is_mine == False
+      neighbors = filter(safe_to_reveal, self.neighbors_of(point))  # yields the result
+
+      for neighbor in neighbors:
         cell = self.cell_at(neighbor)
 
         cell.reveal()
-        self.revealed.append(neighbor)
+        self.cells.revealed.append(neighbor)
 
         if cell.adjacent_mines == 0:
           queue.append(neighbor)
 
+  @validate_point(check_bounds=True, check_revealed=True)
   def flag(self, point: Point) -> None:
-    if point in self.revealed:
-      raise FlaggingRevealedCellError
-
     (cell := self.cell_at(point)).flag()
-    self.flagged_count += 1 if cell.is_flagged else -1
+    self.count.flagged += 1 if cell.is_flagged else -1
+
     if not cell.is_mine:
       return
 
-    if cell.is_flagged:
-      self.revealed.append(point)
-    else:
-      self.revealed.remove(point)
+    # Flagged a mine, commit greatness
 
   def is_victory(self) -> bool:
-    return len(self.revealed) == self.total_safe_cells
+    return len(self.cells.revealed) == self.count.safe
 
-  @lru_cache(maxsize=FIELD_SIZE.cells)
+  @validate_point(check_bounds=True)
   def cell_at(self, point: Point) -> Cell:
-    if point not in self.field:
-      raise NotInFieldError
     return self.field[point]
 
+  @validate_point(check_bounds=True)
+  def neighbors_of(self, point: Point) -> list[Point]:
+    return self.neighbors[point]
 
-@lru_cache(maxsize=FIELD_SIZE.cells)
-def get_neighbors(
-    point: Point, size: Size, exclude: tuple = tuple(), include_self=False, extent: int = 1
-) -> list[Point]:
-  """Generate and cache all neighboring coordinates for a given point in a grid."""
+  def calculate_neighbors(self, point: Point, extent: int = 1):
+    """
+    Calculate the neighbors of a given point using the Moore neighborhood.
+    """
 
-  neighbor_range = range(-extent, extent + 1)
-  offsets = tuple(Point(x, y) for x in neighbor_range for y in neighbor_range if (x, y) != (0, 0))
+    neighbor_range = range(-extent, extent + 1)
+    offsets = (Point(x, y) for x in neighbor_range for y in neighbor_range if (x, y) != (0, 0))
 
-  neighbors = [
-      neighbor_point
-      for offset in offsets
-      if (neighbor_point := point + offset).is_within(size)
-      and neighbor_point not in exclude
-  ]
+    in_bound = lambda point: point.is_within(self.size)
+    neighbors = filter(in_bound, (point + offset for offset in offsets))
 
-  if include_self:
-    neighbors.append(point)
-  return neighbors
+    return neighbors
 
 
 def main():
-  def move(prompt: str = "Move: ") -> tuple:
+  def move(prompt: str = "Move: ") -> tuple[str, Point]:
     inp = input(prompt).strip().split()
     p = Point(*map(int, inp[1:3]))
     t = inp[0]
     return t, p
 
-  mf = Minefield(FIELD_SIZE, 2000, move("Start: ")[1])
+  mf = Minefield(FIELD_SIZE, 10)
+  print(mf.count.mines)
   bf = Buffer(mf.field, FIELD_SIZE, Visuals()).display()
+  p = move()[1]
+  os_system("clear" if os_name == "posix" else "cls")
+  mf.boom(p)
+  bf.update(mf.field, mf.cells.revealed).display()
 
   while not mf.is_victory():
     t, p = move()
@@ -192,9 +170,9 @@ def main():
       mf.flag(p)
       modified = [p]
     else:
-      i = len(mf.revealed)
+      i = len(mf.cells.revealed)
       mf.reveal(p)
-      modified = mf.revealed[i:]
+      modified = mf.cells.revealed[i:]
 
     bf.update(mf.field, modified).display()
 

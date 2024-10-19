@@ -6,12 +6,12 @@ class CellAlreadyRevealedError(RuntimeError):
   """Raised when a player attempts to flag an already revealed cell."""
 
 
+class CellAlreadyFlaggedError(RuntimeError):
+  """Raised when a player attempts to flag a revealed cell."""
+
+
 class NotInFieldError(RuntimeError):
   """Raised when a player attempts to reveal a cell at a point not in the field."""
-
-
-class FlaggingRevealedCellError(CellAlreadyRevealedError):
-  """Raised when a player attempts to flag a revealed cell."""
 
 
 class ItemInListError(ValueError):

@@ -59,6 +59,8 @@ class Cell:
     """Toggle the flagged state of the cell."""
     if not self.is_revealed:  # Can't flag a revealed cell
       self.is_flagged = not self.is_flagged
+    else:
+      self.is_flagged = False
 
   def reveal(self) -> "Cell":
     """Reveal the cell."""
@@ -110,3 +112,17 @@ class Buffer:
   def cell_at(self, point: Point) -> str:
     """Retrieve the visual of a cell at a specific point."""
     return self.buffer[point.y][point.x]
+
+
+@dataclass
+class Count:
+  mines: int = 0
+  flagged: int = 0
+  safe: int = 0
+
+
+@dataclass
+class CellTypes:
+  revealed: DistinctList
+  mines: DistinctList
+  flagged: DistinctList
