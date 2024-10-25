@@ -1,0 +1,11 @@
+Screen {
+    layout: grid;
+    grid-size: 2;
+    grid-gutter: 2;
+    padding: 2;
+}
+
+Button {
+    width: 100%;
+    column-span: 2;
+}

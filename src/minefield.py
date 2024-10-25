@@ -1,9 +1,10 @@
 from os import system as os_system, name as os_name
 from collections import deque
+from typing import Callable
 from random import sample
 
 from structs import Buffer, Size, Point, Cell, DistinctList, Visuals, Count, CellTypes
-from exceptions import *
+from exceptions import MineHitError, CellAlreadyFlaggedError, CellAlreadyRevealedError, NotInFieldError
 
 
 FIELD_SIZE = Size(10, 13)
@@ -122,6 +123,17 @@ class Minefield:
 
     # Flagged a mine, commit greatness
 
+  def get_modified(self) -> Callable:
+    modified_count = len(self.cells.revealed)
+
+    def _() -> list[Point]:
+      nonlocal modified_count
+      previous = modified_count
+      modified_count = len(self.cells.revealed)
+
+      return self.cells.revealed[previous:]
+    return _
+
   def is_victory(self) -> bool:
     return len(self.cells.revealed) == self.count.safe
 
@@ -155,12 +167,15 @@ def main():
     return t, p
 
   mf = Minefield(FIELD_SIZE, 10)
-  print(mf.count.mines)
-  bf = Buffer(mf.field, FIELD_SIZE, Visuals()).display()
+  bf = Buffer(mf.field, FIELD_SIZE, Visuals())
+
+  bf.show()
   p = move()[1]
   os_system("clear" if os_name == "posix" else "cls")
+
+  modified = mf.get_modified()
   mf.boom(p)
-  bf.update(mf.field, mf.cells.revealed).display()
+  bf.visualize(modified()).show()
 
   while not mf.is_victory():
     t, p = move()
@@ -168,13 +183,12 @@ def main():
 
     if t == "f":
       mf.flag(p)
-      modified = [p]
+      bf.visualize([p])
     else:
-      i = len(mf.cells.revealed)
       mf.reveal(p)
-      modified = mf.cells.revealed[i:]
+      bf.visualize(modified())
 
-    bf.update(mf.field, modified).display()
+    bf.show()
 
 
 if __name__ == "__main__":

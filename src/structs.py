@@ -24,6 +24,11 @@ class Point:
     """Add two points together and return a new Point."""
     return Point(self.x + other.x, self.y + other.y)
 
+  def __lt__(self, other):
+    if self.y == other.y:
+      return self.x < other.x
+    return self.y < other.y
+
 
 @dataclass(frozen=True)
 class Size:
@@ -76,9 +81,8 @@ class Cell:
     return str(self.adjacent_mines) if self.adjacent_mines > 0 else visuals.empty
 
   def __str__(self):
-    string = self.visual(Visuals())
-    string += f"\nis_mine: {self.is_mine}, is_revealed: {self.is_revealed}"
-    string += f"\nis_flagged: {self.is_flagged}, adjacent_mines: {self.adjacent_mines}"
+    string = f"is_revealed: {self.is_revealed}, adjacent_mines: {
+        self.adjacent_mines}, is_mine: {self.is_mine}, is_flagged: {self.is_flagged}"
     return string
 
 
@@ -88,30 +92,25 @@ class Buffer:
   def __init__(self, field: dict[Point, Cell], size: Size, visuals: Visuals) -> None:
     self.size = size
     self.visuals = visuals
-    self.buffer = self._initialize_buffer(field)
+    self.field = field
+    self.display: dict[Point, str] = {}
+    self.visualize(field.keys())
 
-  def _initialize_buffer(self, field: dict[Point, Cell]) -> list[list[str]]:
-    """Initialize the buffer with current cell visuals."""
-    return [
-        [field[Point(x, y)].visual(self.visuals) for x in range(self.size.cols)]
-        for y in range(self.size.rows)
-    ]
-
-  def update(self, field: dict[Point, Cell], modified_points: list[Point]) -> "Buffer":
-    """Update only the modified cells in the buffer."""
-    for point in modified_points:
-      self.buffer[point.y][point.x] = field[point].visual(self.visuals)
+  def visualize(self, field_points) -> "Buffer":
+    """Update the display buffer with the given field."""
+    for point in field_points:
+      self.display[point] = self.cell_at(point).visual(self.visuals)
     return self
 
-  def display(self) -> "Buffer":
+  def show(self) -> None:
     """Display the current buffer."""
-    for row in self.buffer:
-      print(" ".join(row))
-    return self
+    points = iter(sorted(self.display))
+    for _ in range(self.size.rows):
+      print(" ".join(self.display[next(points)] for _ in range(self.size.cols)))
 
-  def cell_at(self, point: Point) -> str:
-    """Retrieve the visual of a cell at a specific point."""
-    return self.buffer[point.y][point.x]
+  def cell_at(self, point: Point) -> Cell:
+    """Return the cell at the given point."""
+    return self.field[point]
 
 
 @dataclass
