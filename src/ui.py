@@ -1,25 +1,37 @@
-# hello_textual_css.py
+from random import random
+
+from rich.text import Text
 
 from textual.app import App, ComposeResult
-from textual.widgets import Button, Label
-from textual.containers import Horizontal
+from textual.widgets import DataTable, Label
+from textual.coordinate import Coordinate
 
 
-class HelloWorld(App):
-  CSS_PATH = "css/ui.tcss"
+class UpdatingTableExampleApp(App[None]):
 
   def compose(self) -> ComposeResult:
-    yield Label("Hello Textual", id="hello")
-    yield Horizontal(
-        Button("Hi", id="hi", variant="success"),
-        Button("Bye", id="close", variant="warning"),
-    )
-    print("%d" % id(self))
+    yield DataTable()
+    yield Label("Nothing chosen", id="chosen")
 
-  def on_button_pressed(self, event: Button.Pressed) -> None:
-    self.exit(event.button.id)
+  def on_mount(self) -> None:
+    table = self.query_one(DataTable)
+
+    columns = 20
+    rows = 20
+    for column in range(columns):
+      table.add_column(f"col{column}")
+    value = Text("--", justify="center")
+    for n in range(rows):
+      table.add_row(*(value,) * columns, label=str(n))
+
+  def on_data_table_cell_selected(self, event: DataTable.CellSelected):
+    self.query_one("#chosen", Label).update(str(event.coordinate))
+    self.update_table(event.coordinate)
+
+  def update_table(self, coordinate: Coordinate) -> None:
+    table = self.query_one(DataTable)
+    table.update_cell_at(coordinate, random())
 
 
 if __name__ == "__main__":
-  app = HelloWorld()
-  app.run()
+  UpdatingTableExampleApp().run()
