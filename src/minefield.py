@@ -4,7 +4,7 @@ from collections import deque
 from os import system as os_system, name as os_name
 
 from structs import Buffer, Size, Point, Cell, DistinctList, Visuals, Holder
-from exceptions import MineHitError, CellAlreadyFlaggedError, CellAlreadyRevealedError, NotInFieldError
+from exceptions import MineHitError, CellAlreadyFlaggedError, CellAlreadyRevealedError, NotInFieldError, Victory
 
 
 def validate_point(check_bounds=True, check_revealed=False, check_mines=False, check_flagged=False):
@@ -162,8 +162,13 @@ def main():
     t = inp[0]
     return t, p
 
-  FIELD_SIZE = Size(10, 10)
+  def show(self):
+    for row in self.get_rows():
+      print(" ".join(row))
+
+  FIELD_SIZE = Size(4, 4)
   mf = Minefield(FIELD_SIZE, 10)
+  Buffer.show = show
   bf = Buffer(mf.field, FIELD_SIZE, Visuals())
 
   bf.show()

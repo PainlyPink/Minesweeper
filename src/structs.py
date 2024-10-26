@@ -106,11 +106,11 @@ class Buffer:
       self.display[point] = self.cell_at(point).visual(self.visuals)
     return self
 
-  def show(self) -> None:
+  def get_rows(self):
     """Display the current buffer."""
     points = iter(sorted(self.display))
     for _ in range(self.size.rows):
-      print(" ".join(self.display[next(points)] for _ in range(self.size.cols)))
+      yield (self.display[next(points)] for _ in range(self.size.cols))
 
   def cell_at(self, point: Point) -> Cell:
     """Return the cell at the given point."""
