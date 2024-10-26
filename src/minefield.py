@@ -91,6 +91,8 @@ class Minefield:
       if cell.adjacent_mines == 0:
         queue.extend(self.neighbors_of(point))
 
+    self.is_victory()
+
   @validate_point(check_bounds=True, check_revealed=True)
   def flag(self, point: Point) -> None:
     (cell := self.cell_at(point)).flag()
@@ -115,7 +117,9 @@ class Minefield:
     return _
 
   def is_victory(self) -> bool:
-    return len(self.cells.revealed) == self.count.safe
+    victory = len(self.cells.revealed) == self.count.safe or self.cells.flagged == self.cells.mines
+    if victory:
+      raise Victory
 
   @validate_point(check_bounds=True)
   def cell_at(self, point: Point) -> Cell:

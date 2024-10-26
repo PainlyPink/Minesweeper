@@ -20,3 +20,7 @@ class ItemInListError(ValueError):
 
 class NoMoreFlagsError(RuntimeError):
   """Raised when a player attempts to flag a cell without any flags."""
+
+
+class Victory(Exception):
+  """Raised when a player wins the game."""
