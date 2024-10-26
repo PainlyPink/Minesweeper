@@ -57,6 +57,8 @@ class Minefield:
     self.set_mines(mine_points)
     self.reveal(point)
 
+    self.clear_cache()
+
   def generate_mine_points(self, safe_zone: set[Point]) -> list[Point]:
     field = set(self.field)
 
@@ -135,6 +137,18 @@ class Minefield:
     neighbors = filter(in_bound, (point + offset for offset in offsets))
 
     return neighbors
+
+  def clear_cache(self) -> None:
+    del (
+        Minefield.set_neighbors,
+        Minefield.set_mines,
+        Minefield.set_field,
+        Minefield.increment_mine_neighbors,
+        Minefield.generate_mine_points,
+        Minefield.clear_cache,
+        Minefield.calculate_neighbors,
+        Minefield.boom,
+    )
 
 
 def main():
