@@ -120,9 +120,9 @@ class Buffer:
 @dataclass
 class Holder:
 
+  def __init__(self, **kwargs):
+    for key, value in kwargs.items():
+      setattr(self, key, value)
 
-@dataclass
-class CellTypes:
-  revealed: DistinctList
-  mines: DistinctList
-  flagged: DistinctList
+  def __repr__(self):
+    return self.__dict__.__repr__()
