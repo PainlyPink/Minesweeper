@@ -50,7 +50,8 @@ class Minefield:
 
   @validate_point(check_bounds=True)
   def boom(self, point: Point) -> None:
-    safe_zone = self.calculate_neighbors(point, extent=EXTENT)
+    extent = max(1, self.size.cells >> self.count.safe)
+    safe_zone = self.calculate_neighbors(point, extent=extent)
     mine_points = self.generate_mine_points(set(safe_zone) | {point})
 
     self.set_mines(mine_points)
@@ -64,7 +65,7 @@ class Minefield:
   def set_mines(self, mine_points: list[Point]) -> None:
     for mine_point in mine_points:
       self.cell_at(mine_point).is_mine = True
-      self.cells.mines.append(mine_point)
+      self.cells.mines.add(mine_point)
       self.increment_mine_neighbors(mine_point)
 
   def increment_mine_neighbors(self, point: Point) -> None:

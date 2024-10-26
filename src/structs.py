@@ -118,10 +118,7 @@ class Buffer:
 
 
 @dataclass
-class Count:
-  mines: int = 0
-  flagged: int = 0
-  safe: int = 0
+class Holder:
 
 
 @dataclass
