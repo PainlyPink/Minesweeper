@@ -1,9 +1,9 @@
-from os import system as os_system, name as os_name
-from collections import deque
-from typing import Callable
 from random import sample
+from typing import Callable
+from collections import deque
+from os import system as os_system, name as os_name
 
-from structs import Buffer, Size, Point, Cell, DistinctList, Visuals, Count, CellTypes
+from structs import Buffer, Size, Point, Cell, DistinctList, Visuals, Holder
 from exceptions import MineHitError, CellAlreadyFlaggedError, CellAlreadyRevealedError, NotInFieldError
 
 
