@@ -144,6 +144,7 @@ def main():
     t = inp[0]
     return t, p
 
+  FIELD_SIZE = Size(10, 10)
   mf = Minefield(FIELD_SIZE, 10)
   bf = Buffer(mf.field, FIELD_SIZE, Visuals())
 
