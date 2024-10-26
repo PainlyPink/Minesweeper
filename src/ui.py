@@ -16,19 +16,6 @@ def to_point(self) -> Point:
 Coordinate.to_point = to_point
 
 
-class SingleLineInput(Input):
-  DEFAULT_CSS = """
-    SingleLineInput {
-        height: 1;
-        border: none;
-    }
-
-    SingleLineInput:focus {
-        border: none;
-    }
-    """
-
-
 class MineTable(Screen):
 
   BINDINGS = [("q", "quit", "Quit")]

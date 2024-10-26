@@ -12,7 +12,21 @@ class Visuals:
   hidden = Text("?", style="cyan", justify="center")
   mine = Text("X", style="red", justify="center")
   flag = Text("F", style="yellow", justify="center")
-  empty = Text(" ", style="white", justify="center")
+  empty = Text(" ", justify="center")
+
+  def number(self, n):
+    if n == 1:
+      return Text("1", style="wheat4 bold", justify="center")
+    if n == 2:
+      return Text("2", style="plum4 bold", justify="center")
+    if n == 3:
+      return Text("3", style="orange4 bold", justify="center")
+    if n == 4:
+      return Text("4", style="medium_purple3 bold", justify="center")
+    if n == 5:
+      return Text("5", style="dark_magenta bold", justify="center")
+
+    return Text(str(n), style="bright_magenta bold", justify="center")
 
 
 class DistinctList(list):
@@ -88,7 +102,7 @@ class Cell:
       return visuals.flag if self.is_flagged else visuals.hidden
     if self.is_mine:
       return visuals.mine
-    return str(self.adjacent_mines) if self.adjacent_mines > 0 else visuals.empty
+    return visuals.number(self.adjacent_mines) if self.adjacent_mines > 0 else visuals.empty
 
   def __str__(self):
     string = f"is_revealed: {self.is_revealed}, adjacent_mines: {
