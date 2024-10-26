@@ -49,10 +49,10 @@ class Size:
 class Visuals:
   """Stores visual symbols for different cell states."""
 
-  hidden: str = "\033[96m■\033[0m"
-  mine: str = "\033[91m⌀\033[0m"
-  flag: str = "\033[93m⚑\033[0m"
-  empty: str = "0"
+  hidden: str = "📦"
+  mine: str = "💣"
+  flag: str = "🚩"
+  empty: str = "◾"
 
 
 class Cell:
