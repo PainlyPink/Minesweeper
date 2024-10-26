@@ -92,12 +92,13 @@ class Minefield:
   @validate_point(check_bounds=True, check_revealed=True)
   def flag(self, point: Point) -> None:
     (cell := self.cell_at(point)).flag()
-    self.count.flagged += 1 if cell.is_flagged else -1
 
-    if not cell.is_mine:
-      return
-
-    # Flagged a mine, commit greatness
+    if cell.is_flagged:
+      self.cells.flagged.add(point)
+      self.count.flagged += 1
+    else:
+      self.cells.flagged.discard(point)
+      self.count.flagged -= 1
 
   def get_modified(self) -> Callable:
     modified_count = len(self.cells.revealed)
