@@ -1,6 +1,17 @@
 from dataclasses import dataclass
+from textual.coordinate import Coordinate
 
 from exceptions import ItemInListError
+
+
+@dataclass
+class Visuals:
+  """Stores visual symbols for different cell states."""
+
+  hidden: str = "📦"
+  mine: str = "🎆"
+  flag: str = "🚩"
+  empty: str = "⬛"
 
 
 class DistinctList(list):
@@ -31,6 +42,10 @@ class Point:
       return self.x < other.x
     return self.y < other.y
 
+  def to_coordinate(self) -> Coordinate:
+    """Convert the point to a coordinate."""
+    return Coordinate(self.y, self.x)
+
 
 @dataclass(frozen=True)
 class Size:
@@ -43,16 +58,6 @@ class Size:
   def cells(self) -> int:
     """Return the total number of cells."""
     return self.rows * self.cols
-
-
-@dataclass
-class Visuals:
-  """Stores visual symbols for different cell states."""
-
-  hidden: str = "📦"
-  mine: str = "💣"
-  flag: str = "🚩"
-  empty: str = "◾"
 
 
 class Cell:
@@ -93,24 +98,16 @@ class Cell:
 class Buffer:
   """Manages the display buffer of the minefield."""
 
-  def __init__(self, field: dict[Point, Cell], size: Size, visuals: Visuals) -> None:
-    self.size = size
-    self.visuals = visuals
+  def __init__(self, field: dict[Point, Cell], visuals: Visuals) -> None:
     self.field = field
-    self.display: dict[Point, str] = {}
-    self.visualize(field.keys())
+    self.visuals = visuals
 
-  def visualize(self, field_points) -> "Buffer":
+  def visualize(self, field_points) -> dict[Point, str]:
     """Update the display buffer with the given field."""
+    display = {}
     for point in field_points:
-      self.display[point] = self.cell_at(point).visual(self.visuals)
-    return self
-
-  def get_rows(self):
-    """Display the current buffer."""
-    points = iter(sorted(self.display))
-    for _ in range(self.size.rows):
-      yield (self.display[next(points)] for _ in range(self.size.cols))
+      display[point] = self.cell_at(point).visual(self.visuals)
+    return display
 
   def cell_at(self, point: Point) -> Cell:
     """Return the cell at the given point."""
