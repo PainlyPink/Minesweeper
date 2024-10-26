@@ -74,36 +74,20 @@ class Minefield:
 
   @validate_point(check_bounds=True, check_revealed=True, check_mines=True)
   def reveal(self, point: Point) -> None:
-    (cell := self.cell_at(point)).reveal()
-    self.cells.revealed.append(point)
-
-    # Automatically reveal neighboring cells if no adjacent mines
-    if cell.adjacent_mines == 0:
-      self.reveal_neighbors(point)
-
-  def reveal_neighbors(self, start_point: Point) -> None:
-    """
-    Iteratively reveal all neighboring cells around a given point using a breadth-first approach.
-    This avoids hitting the recursion limit by using a queue for the iterative reveal process.
-    """
-    queue = deque([start_point])
-
-    def safe_to_reveal(point):
-      return (cell := self.cell_at(point)).is_revealed == cell.is_mine is False
+    revealed = self.cells.revealed
+    mines_and_flagged = self.cells.mines | self.cells.flagged
+    queue = deque([point])
 
     while queue:
       point = queue.popleft()
+      if point in revealed or point in mines_and_flagged:
+        continue
 
-      neighbors = filter(safe_to_reveal, self.neighbors_of(point))  # yields the result
+      (cell := self.cell_at(point)).reveal()
+      revealed.append(point)
 
-      for neighbor in neighbors:
-        cell = self.cell_at(neighbor)
-
-        cell.reveal()
-        self.cells.revealed.append(neighbor)
-
-        if cell.adjacent_mines == 0:
-          queue.append(neighbor)
+      if cell.adjacent_mines == 0:
+        queue.extend(self.neighbors_of(point))
 
   @validate_point(check_bounds=True, check_revealed=True)
   def flag(self, point: Point) -> None:
