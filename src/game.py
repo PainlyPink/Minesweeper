@@ -1,7 +1,9 @@
+from rich.text import Text
+
 from minefield import Minefield
 from structs import Buffer, Visuals, Point, Size
 
-modified = dict[Point, str]
+modified = dict[Point, Text]
 
 
 class Game:

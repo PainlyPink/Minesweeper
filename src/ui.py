@@ -1,10 +1,9 @@
-from random import choice
-
 from rich.text import Text
 
+from textual.screen import Screen
 from textual.coordinate import Coordinate
 from textual.app import App, ComposeResult
-from textual.widgets import DataTable, Label
+from textual.widgets import DataTable, Label, Header, Button, Input
 
 from game import Game
 from structs import Point, Size, Visuals
@@ -17,11 +16,26 @@ def to_point(self) -> Point:
 Coordinate.to_point = to_point
 
 
-class MineTable(App[None]):
+class SingleLineInput(Input):
+  DEFAULT_CSS = """
+    SingleLineInput {
+        height: 1;
+        border: none;
+    }
+
+    SingleLineInput:focus {
+        border: none;
+    }
+    """
+
+
+class MineTable(Screen):
+
+  BINDINGS = [("q", "quit", "Quit")]
 
   def compose(self) -> ComposeResult:
     yield DataTable()
-    yield Label("Nothing chosen", id="chosen")
+    yield Label("Loading...", id="chosen")
 
   def on_mount(self) -> None:
     self.table = self.query_one(DataTable)
@@ -33,7 +47,7 @@ class MineTable(App[None]):
     for column in range(size.cols):
       self.table.add_column(Text(f"{column:02}", justify="center"))
 
-    cell = Text(Visuals.hidden, justify="center")
+    cell = Visuals.hidden
     for row in range(size.rows):
       self.table.add_row(*(cell,) * size.cols, label=f"{row:02}")
 
@@ -45,13 +59,58 @@ class MineTable(App[None]):
 
   def update_table(self, coordinate: Coordinate) -> None:
     modified = game.play_move("r", coordinate.to_point())
-    center = lambda text: Text(text, justify="center")  # noqa: E731
 
     for point, cell in modified.items():
-      self.table.update_cell_at(point.to_coordinate(), center(cell))
+      self.table.update_cell_at(point.to_coordinate(), cell)
+
+  def action_quit(self) -> None:
+    self.app.pop_screen()
+
+
+class SQLLogin(Screen):
+
+  BINDINGS = [("q", "quit", "Quit")]
+
+  def compose(self) -> ComposeResult:
+    yield Label(Text("SQL LOGIN", style="bold", justify="center"))
+
+    yield Label(Text("Host Name (Required)", style="bold"))
+    yield Input(placeholder="host", id="host")
+
+    yield Label(Text("User Name (Required)", style="bold"))
+    yield Input(placeholder="user", id="user")
+
+    yield Label(Text("Password (Required)", style="bold"))
+    yield Input(placeholder="password", id="password")
+
+    yield Label(Text("Database Name", style="bold"))
+    yield Input(placeholder="database", id="database")
+
+    yield Button("Login", variant="success", id="login")
+    yield Label(Text("status", style="italic"), id="status")
+
+  def action_quit(self) -> None:
+    self.app.pop_screen()
+
+
+class ModalApp(App[None]):
+
+  def compose(self) -> ComposeResult:
+    yield Header()
+    yield Button("Play", variant="success", id="play")
+    yield Button("SQL login", variant="primary", id="sql")
+    yield Button("Quit", variant="warning", id="quit")
+
+  def on_button_pressed(self, event: Button.Pressed) -> None:
+    if event.button.id == "play":
+      self.push_screen(MineTable())
+    elif event.button.id == "sql":
+      self.push_screen(SQLLogin())
+    elif event.button.id == "quit":
+      self.exit()
 
 
 if __name__ == "__main__":
   game = Game(Size(20, 20), 10)
-  app = MineTable()
+  app = ModalApp()
   app.run()

@@ -1,3 +1,4 @@
+from rich.text import Text
 from dataclasses import dataclass
 from textual.coordinate import Coordinate
 
@@ -8,10 +9,10 @@ from exceptions import ItemInListError
 class Visuals:
   """Stores visual symbols for different cell states."""
 
-  hidden: str = "📦"
-  mine: str = "🎆"
-  flag: str = "🚩"
-  empty: str = "⬛"
+  hidden = Text("?", style="cyan", justify="center")
+  mine = Text("X", style="red", justify="center")
+  flag = Text("F", style="yellow", justify="center")
+  empty = Text(" ", style="white", justify="center")
 
 
 class DistinctList(list):
@@ -81,7 +82,7 @@ class Cell:
     self.is_revealed = True
     return self
 
-  def visual(self, visuals: Visuals) -> str:
+  def visual(self, visuals: Visuals) -> Text:
     """Return a visual representation of the cell."""
     if not self.is_revealed:
       return visuals.flag if self.is_flagged else visuals.hidden
