@@ -4,6 +4,7 @@ from exceptions import ItemInListError
 
 
 class DistinctList(list):
+
   def append(self, item):
     if item in self:
       raise ItemInListError(f"Item `{item}` already exists in list.")
@@ -13,14 +14,15 @@ class DistinctList(list):
 @dataclass(frozen=True)
 class Point:
   """Represents a point (x, y) in the grid."""
+
   x: int
   y: int
 
-  def is_within(self, size: 'Size') -> bool:
+  def is_within(self, size: "Size") -> bool:
     """Check if the point is within the given size boundaries."""
     return 0 <= self.x < size.cols and 0 <= self.y < size.rows
 
-  def __add__(self, other: 'Point') -> 'Point':
+  def __add__(self, other: "Point") -> "Point":
     """Add two points together and return a new Point."""
     return Point(self.x + other.x, self.y + other.y)
 
@@ -33,6 +35,7 @@ class Point:
 @dataclass(frozen=True)
 class Size:
   """Represents the size of the minefield (rows, cols)."""
+
   rows: int
   cols: int
 
@@ -45,6 +48,7 @@ class Size:
 @dataclass
 class Visuals:
   """Stores visual symbols for different cell states."""
+
   hidden: str = "\033[96m■\033[0m"
   mine: str = "\033[91m⌀\033[0m"
   flag: str = "\033[93m⚑\033[0m"

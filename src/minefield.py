@@ -26,7 +26,9 @@ def validate_point(check_bounds=True, check_revealed=False, check_mines=False, c
         raise CellAlreadyFlaggedError
 
       return func(self, point, *args, **kwargs)
+
     return wrapper
+
   return decorator
 
 
@@ -37,17 +39,9 @@ class Minefield:
 
     mine_count = self.size.cells * mine_density // 100
     safe_count = self.size.cells - mine_count
-    self.count = Count(
-        mines=mine_count,
-        safe=safe_count,
-        flagged=0
-    )
+    self.count = Count(mines=mine_count, safe=safe_count, flagged=0)
 
-    self.cells = CellTypes(
-        revealed=DistinctList(),
-        mines=DistinctList(),
-        flagged=DistinctList()
-    )
+    self.cells = CellTypes(revealed=DistinctList(), mines=DistinctList(), flagged=DistinctList())
 
     self.field = self.set_field()
     self.neighbors = self.set_neighbors()
@@ -98,10 +92,12 @@ class Minefield:
     """
     queue = deque([start_point])
 
+    def safe_to_reveal(point):
+      return (cell := self.cell_at(point)).is_revealed == cell.is_mine is False
+
     while queue:
       point = queue.popleft()
 
-      safe_to_reveal = lambda point: (cell := self.cell_at(point)).is_revealed == cell.is_mine == False
       neighbors = filter(safe_to_reveal, self.neighbors_of(point))  # yields the result
 
       for neighbor in neighbors:
@@ -132,6 +128,7 @@ class Minefield:
       modified_count = len(self.cells.revealed)
 
       return self.cells.revealed[previous:]
+
     return _
 
   def is_victory(self) -> bool:
@@ -153,7 +150,7 @@ class Minefield:
     neighbor_range = range(-extent, extent + 1)
     offsets = (Point(x, y) for x in neighbor_range for y in neighbor_range if (x, y) != (0, 0))
 
-    in_bound = lambda point: point.is_within(self.size)
+    in_bound = lambda point: point.is_within(self.size)  # noqa: E731
     neighbors = filter(in_bound, (point + offset for offset in offsets))
 
     return neighbors

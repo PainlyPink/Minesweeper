@@ -1,0 +1,7 @@
+# pyproject.toml
+
+[tool.pyink]
+line-length = 120      # Set line length for Pyink
+
+[tool.ruff]
+ignore = ["E111"]     # Indentation is not a multiple of four (handled by pyink)

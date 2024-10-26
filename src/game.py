@@ -3,6 +3,7 @@ from structs import Buffer, Visuals, Point, Size
 
 
 class Game:
+
   def __init__(self, field_size: Size, mine_density: int):
     self.minefield = Minefield(field_size, mine_density)
     self.buffer = Buffer(self.minefield.field, field_size, Visuals())
@@ -12,6 +13,7 @@ class Game:
   def clear_screen(self):
     """Clear the screen based on the operating system."""
     from os import system as os_system, name as os_name
+
     os_system("clear" if os_name == "posix" else "cls")
 
   def get_move(self, prompt: str = "Move: ") -> tuple[str, Point]:
