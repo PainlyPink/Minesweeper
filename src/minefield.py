@@ -7,11 +7,6 @@ from structs import Buffer, Size, Point, Cell, DistinctList, Visuals, Holder
 from exceptions import MineHitError, CellAlreadyFlaggedError, CellAlreadyRevealedError, NotInFieldError
 
 
-FIELD_SIZE = Size(10, 13)
-DIFFICULTY = 9
-EXTENT = max(1, FIELD_SIZE.cells >> DIFFICULTY)  # x >> n == x // 2ⁿ
-
-
 def validate_point(check_bounds=True, check_revealed=False, check_mines=False, check_flagged=False):
   def decorator(func):
     def wrapper(self, point: Point, *args, **kwargs) -> Point:
