@@ -34,9 +34,9 @@ class Minefield:
 
     mine_count = self.size.cells * mine_density // 100
     safe_count = self.size.cells - mine_count
-    self.count = Count(mines=mine_count, safe=safe_count, flagged=0)
+    self.count = Holder(mines=mine_count, safe=safe_count, flagged=0)
 
-    self.cells = CellTypes(revealed=DistinctList(), mines=DistinctList(), flagged=DistinctList())
+    self.cells = Holder(revealed=DistinctList(), mines=set(), flagged=set())
 
     self.field = self.set_field()
     self.neighbors = self.set_neighbors()
