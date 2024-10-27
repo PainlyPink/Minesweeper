@@ -2,6 +2,7 @@ from time import monotonic
 from rich.text import Text
 
 from textual.screen import Screen
+from pyfiglet import figlet_format
 from textual.reactive import reactive
 from textual.coordinate import Coordinate
 from textual.app import App, ComposeResult
@@ -60,14 +61,18 @@ class MineTable(Screen):
   BINDINGS = [("q", "quit", "Quit")]
 
   def compose(self) -> ComposeResult:
+    yield Horizontal(Label(Text("Mine Quanto", style="bold")), TimeDisplay())
+
     yield DataTable()
+    yield Static()
+
     yield Label("Loading...", id="chosen")
-    yield Horizontal(TimeDisplay(), Label("😺"), Label("💀: 0"))
+
     yield Footer()
 
   def on_mount(self) -> None:
     global game
-    game = Game(Size(4, 4), 10)
+    game = Game(Size(9, 9), 10)
 
     self.table = self.query_one(DataTable)
     self.fill_table()
@@ -198,18 +203,20 @@ class SQLLogin(Screen):
 class ModalApp(App[None]):
 
   DEFAULT_CSS = """
-    * {
+    .center {
       text-align: center;
     }
   """
 
   def compose(self) -> ComposeResult:
-    self.title = "Quantum Minesweeper"
-    yield Header(show_clock=True)
+    self.title = "Py-Quantum Minesweeper"
+    yield Header(show_clock=True, classes="center")
+    yield Static(Text(figlet_format("*Mine Quanto*"), style="bold red", justify="full"))
     yield Container(
         Button("Play", variant="success", id="play"),
         Button("SQL", variant="primary", id="sql"),
         Button("Quit", variant="warning", id="quit"),
+        classes="center",
     )
 
   def on_button_pressed(self, event: Button.Pressed) -> None:
