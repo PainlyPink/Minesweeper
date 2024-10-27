@@ -4,8 +4,8 @@ from rich.text import Text
 from textual.screen import Screen
 from textual.reactive import reactive
 from textual.coordinate import Coordinate
-from textual.containers import Horizontal
 from textual.app import App, ComposeResult
+from textual.containers import Container, Horizontal
 from textual.widgets import DataTable, Label, Header, Button, Input, Footer, Static
 
 import sql
@@ -41,7 +41,7 @@ class TimeDisplay(Static):
     """Called when the time attribute changes."""
     minutes, seconds = divmod(time, 60)
     hours, minutes = divmod(minutes, 60)
-    self.update(f"{hours:02,.0f}:{minutes:02.0f}:{seconds:05.2f}")
+    self.update(Text(f"{hours:02,.0f}:{minutes:02.0f}:{seconds:05.2f}", style="bold"))
 
   def start(self) -> None:
     """Method to start (or resume) time updating."""
@@ -67,7 +67,7 @@ class MineTable(Screen):
 
   def on_mount(self) -> None:
     global game
-    game = Game(Size(8, 8), 10)
+    game = Game(Size(4, 4), 10)
 
     self.table = self.query_one(DataTable)
     self.fill_table()
@@ -111,12 +111,18 @@ class MineTable(Screen):
     for point, cell in revealed.items():
       self.table.update_cell_at(point.to_coordinate(), cell)
 
+    status = "lose"
     if victory:
       self.query_one("#chosen", Label).update("🎉🎉🎉🎉")
-      sqlcon.insert("win", self.query_one(TimeDisplay).time)
+      status = "win"
     else:
       self.query_one("#chosen", Label).update("Better luck next time!")
-      sqlcon.insert("lose", self.query_one(TimeDisplay).time)
+
+    if sqlcon:
+      sqlcon.insert(status, self.query_one(TimeDisplay).time)
+    else:
+      label = self.query_one("#chosen", Label)
+      label.update(Text(f"{label.renderable}\nCould not fetch sql user.", style="italic red"))
 
   def action_quit(self) -> None:
     self.app.pop_screen()
@@ -125,6 +131,12 @@ class MineTable(Screen):
 class SQLLogin(Screen):
 
   BINDINGS = [("q", "quit", "Quit")]
+
+  DEFAULT_CSS = """
+    * {
+      text-align: left;
+    }
+  """
 
   def compose(self) -> ComposeResult:
     if not sql.LOGGED_IN:
@@ -185,12 +197,20 @@ class SQLLogin(Screen):
 
 class ModalApp(App[None]):
 
+  DEFAULT_CSS = """
+    * {
+      text-align: center;
+    }
+  """
+
   def compose(self) -> ComposeResult:
     self.title = "Quantum Minesweeper"
     yield Header(show_clock=True)
-    yield Button("Play", variant="success", id="play")
-    yield Button("SQL", variant="primary", id="sql")
-    yield Button("Quit", variant="warning", id="quit")
+    yield Container(
+        Button("Play", variant="success", id="play"),
+        Button("SQL", variant="primary", id="sql"),
+        Button("Quit", variant="warning", id="quit"),
+    )
 
   def on_button_pressed(self, event: Button.Pressed) -> None:
     if event.button.id == "play":

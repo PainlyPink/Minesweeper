@@ -9,9 +9,9 @@ from exceptions import ItemInListError
 class Visuals:
   """Stores visual symbols for different cell states."""
 
-  hidden = Text("?", style="cyan", justify="center")
-  mine = Text("X", style="red", justify="center")
-  flag = Text("F", style="yellow", justify="center")
+  hidden = "📦"
+  mine = "💀"
+  flag = "🙏"
   empty = Text("0", style="grey37", justify="center")
 
   def number(self, n):
@@ -125,6 +125,7 @@ class Buffer:
     return display
 
   def visualize_all(self) -> dict[Point, str]:
+    self.visuals.mine = "😺"
     for cell in self.field.values():
       cell.is_revealed = True
     return self.visualize(self.field.keys())
