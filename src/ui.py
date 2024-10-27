@@ -3,7 +3,7 @@ from rich.text import Text
 from textual.screen import Screen
 from textual.coordinate import Coordinate
 from textual.app import App, ComposeResult
-from textual.widgets import DataTable, Label, Header, Button, Input
+from textual.widgets import DataTable, Label, Header, Button, Input, Footer
 
 from game import Game
 from structs import Point, Size, Visuals
@@ -23,6 +23,7 @@ class MineTable(Screen):
   def compose(self) -> ComposeResult:
     yield DataTable()
     yield Label("Loading...", id="chosen")
+    yield Footer()
 
   def on_mount(self) -> None:
     self.table = self.query_one(DataTable)
@@ -62,19 +63,28 @@ class SQLLogin(Screen):
     yield Label(Text("SQL LOGIN", style="bold", justify="center"))
 
     yield Label(Text("Host Name (Required)", style="bold"))
-    yield Input(placeholder="host", id="host")
+    yield Input(placeholder="host")
 
     yield Label(Text("User Name (Required)", style="bold"))
-    yield Input(placeholder="user", id="user")
+    yield Input(placeholder="user")
 
     yield Label(Text("Password (Required)", style="bold"))
-    yield Input(placeholder="password", id="password")
+    yield Input(placeholder="password", password=True)
 
     yield Label(Text("Database Name", style="bold"))
-    yield Input(placeholder="database", id="database")
+    yield Input(placeholder="database")
 
     yield Button("Login", variant="success", id="login")
     yield Label(Text("status", style="italic"), id="status")
+
+    yield Footer()
+
+  def on_button_pressed(self, event: Button.Pressed) -> None:
+    credentials = self.query(Input)
+    representation = ""
+    for i in credentials:
+      representation += i.value
+    self.query_one("#status", Label).update(representation)
 
   def action_quit(self) -> None:
     self.app.pop_screen()
