@@ -2,6 +2,3 @@ __pycache__
 .**
 **.ini
 temp**
-*.spec
-build
-dist
