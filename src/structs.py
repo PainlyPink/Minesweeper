@@ -12,7 +12,7 @@ class Visuals:
   hidden = Text("?", style="cyan", justify="center")
   mine = Text("X", style="red", justify="center")
   flag = Text("F", style="yellow", justify="center")
-  empty = Text(" ", justify="center")
+  empty = Text("0", style="grey37", justify="center")
 
   def number(self, n):
     if n == 1:
@@ -123,6 +123,11 @@ class Buffer:
     for point in field_points:
       display[point] = self.cell_at(point).visual(self.visuals)
     return display
+
+  def visualize_all(self) -> dict[Point, str]:
+    for cell in self.field.values():
+      cell.is_revealed = True
+    return self.visualize(self.field.keys())
 
   def cell_at(self, point: Point) -> Cell:
     """Return the cell at the given point."""
