@@ -30,3 +30,11 @@ class sql:
         f"CREATE TABLE IF NOT EXISTS {self.table} (match_id INT AUTO_INCREMENT, win_or_lose CHAR(1), time INT)"
     )
     self.mycon.commit()
+
+  def insert(self, win_or_lose, time):
+    self.mycur.execute(f"INSERT INTO {self.table} (win_or_lose, time) VALUES ('{win_or_lose}', {time})")
+    self.mycon.commit()
+
+  def pull(self):
+    self.mycur.execute(f"SELECT * FROM {self.table}")
+    return self.mycur.fetchall()

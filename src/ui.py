@@ -8,10 +8,10 @@ from textual.containers import Horizontal
 from textual.app import App, ComposeResult
 from textual.widgets import DataTable, Label, Header, Button, Input, Footer, Static
 
+import sql
 from game import Game
-from exceptions import *
-from sql import LOGGED_IN, sql
 from structs import Point, Size, Visuals
+from exceptions import Victory, CellAlreadyRevealedError, MineHitError
 
 
 def to_point(self) -> Point:
@@ -19,6 +19,7 @@ def to_point(self) -> Point:
 
 
 Coordinate.to_point = to_point
+sqlcon: sql.sql = None
 
 
 class TimeDisplay(Static):
@@ -112,8 +113,10 @@ class MineTable(Screen):
 
     if victory:
       self.query_one("#chosen", Label).update("🎉🎉🎉🎉")
+      sqlcon.insert("win", self.query_one(TimeDisplay).time)
     else:
       self.query_one("#chosen", Label).update("Better luck next time!")
+      sqlcon.insert("lose", self.query_one(TimeDisplay).time)
 
   def action_quit(self) -> None:
     self.app.pop_screen()
@@ -124,7 +127,7 @@ class SQLLogin(Screen):
   BINDINGS = [("q", "quit", "Quit")]
 
   def compose(self) -> ComposeResult:
-    if not LOGGED_IN:
+    if not sql.LOGGED_IN:
       yield from self.login_page()
     else:
       yield from self.statistics_page()
@@ -155,19 +158,24 @@ class SQLLogin(Screen):
     credentials = [input.value for input in inputs]
 
     try:
-      global sql
-      sqlcon = sql(*credentials)
+      global sqlcon
+      sqlcon = sql.sql(*credentials)
     except Exception as e:
       status.update(Text(f"failed\n{e}", style="italic red"))
     else:
       status.update(Text("success", style="italic green"))
-      global LOGGED_IN
-      LOGGED_IN = True
+      sql.LOGGED_IN = True
 
     self.recompose()
 
   def statistics_page(self):
     yield Label(Text("STATISTICS", style="bold", justify="center"))
+    yield DataTable()
+
+  def on_mount(self):
+    if sql.LOGGED_IN:
+      # rows = sqlcon.pull()
+      self.query_one(Label).update("showing stats")
 
   def action_quit(self) -> None:
     self.app.pop_screen()
