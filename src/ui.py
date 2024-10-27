@@ -176,6 +176,8 @@ class SQLLogin(Screen):
     if sql.LOGGED_IN:
       # rows = sqlcon.pull()
       self.query_one(Label).update("showing stats")
+      self.table = self.query_one(DataTable)
+      # update table with rows
 
   def action_quit(self) -> None:
     self.app.pop_screen()
