@@ -21,7 +21,6 @@ def to_point(self) -> Point:
 
 Coordinate.to_point = to_point
 sqlcon: sql.sql = None
-sql.LOGGED_IN = True
 
 
 class TimeDisplay(Static):
