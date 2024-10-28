@@ -124,8 +124,9 @@ class Buffer:
       display[point] = self.cell_at(point).visual(self.visuals)
     return display
 
-  def visualize_all(self) -> dict[Point, str]:
-    self.visuals.mine = "😺"
+  def visualize_all(self, victory: bool = False) -> dict[Point, str]:
+    if victory:
+      self.visuals.mine = "😺"
     for cell in self.field.values():
       cell.is_revealed = True
     return self.visualize(self.field.keys())

@@ -6,7 +6,7 @@ from pyfiglet import figlet_format
 from textual.reactive import reactive
 from textual.coordinate import Coordinate
 from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal
+from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import DataTable, Label, Header, Button, Input, Footer, Static
 
 import sql
@@ -40,9 +40,7 @@ class TimeDisplay(Static):
 
   def watch_time(self, time: float) -> None:
     """Called when the time attribute changes."""
-    minutes, seconds = divmod(time, 60)
-    hours, minutes = divmod(minutes, 60)
-    self.update(Text(f"{hours:02,.0f}:{minutes:02.0f}:{seconds:05.2f}", style="bold"))
+    self.update(Text(f"{time:005.2f}s", style="bold bright_black"))
 
   def start(self) -> None:
     """Method to start (or resume) time updating."""
@@ -59,15 +57,23 @@ class TimeDisplay(Static):
 class MineTable(Screen):
 
   BINDINGS = [("q", "quit", "Quit")]
+  DEFAULT_CSS = """
+    TimeDisplay {
+      text-align: left;
+    }
+    DataTable {
+      padding: 0;
+    }
+    Button {
+      height: auto;
+      width: auto;
+    }"""
 
   def compose(self) -> ComposeResult:
-    yield Horizontal(Label(Text("Mine Quanto", style="bold")), TimeDisplay())
-
+    yield TimeDisplay()
     yield DataTable()
-    yield Static()
-
     yield Label("Loading...", id="chosen")
-
+    yield Button("<-", variant="primary")
     yield Footer()
 
   def on_mount(self) -> None:
@@ -88,7 +94,7 @@ class MineTable(Screen):
       self.table.add_row(*(cell,) * size.cols, label=f"{row:02}")
 
   def on_data_table_cell_highlighted(self, event: DataTable.CellHighlighted):
-    self.query_one("#chosen", Label).update(str(event.coordinate))
+    self.query_one("#chosen", Label).update(Text(f"\n😺\n{event.coordinate}", style="italic bright_black"))
 
   def on_data_table_cell_selected(self, event: DataTable.CellSelected):
     self.update_table(event.coordinate)
@@ -111,23 +117,27 @@ class MineTable(Screen):
 
   def end_game(self, victory: bool = False) -> None:
     self.table.cursor_type = "none"
-    revealed = game.buffer.visualize_all()
+    revealed = game.buffer.visualize_all(victory)
+    label = self.query_one("#chosen", Label)
 
     for point, cell in revealed.items():
       self.table.update_cell_at(point.to_coordinate(), cell)
 
     status = "lose"
     if victory:
-      self.query_one("#chosen", Label).update("🎉🎉🎉🎉")
+      label.update("\n😺🎉")
       status = "win"
     else:
-      self.query_one("#chosen", Label).update("Better luck next time!")
+      label.update("\n😿")
 
     if sqlcon:
       sqlcon.insert(status, self.query_one(TimeDisplay).time)
+      label.update(Text(f"{label.renderable}\nSQL committed.", style="italic green"))
     else:
-      label = self.query_one("#chosen", Label)
       label.update(Text(f"{label.renderable}\nCould not fetch sql user.", style="italic red"))
+
+  def on_button_pressed(self) -> None:
+    self.action_quit()
 
   def action_quit(self) -> None:
     self.app.pop_screen()
