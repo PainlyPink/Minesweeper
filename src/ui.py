@@ -4,9 +4,9 @@ from rich.text import Text
 from textual.screen import Screen
 from pyfiglet import figlet_format
 from textual.reactive import reactive
+from textual.containers import Container
 from textual.coordinate import Coordinate
 from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import DataTable, Label, Header, Button, Input, Footer, Static
 
 import sql
@@ -21,6 +21,7 @@ def to_point(self) -> Point:
 
 Coordinate.to_point = to_point
 sqlcon: sql.sql = None
+sql.LOGGED_IN = True
 
 
 class TimeDisplay(Static):
@@ -200,11 +201,26 @@ class SQLLogin(Screen):
     yield DataTable()
 
   def on_mount(self):
-    if sql.LOGGED_IN:
-      # rows = sqlcon.pull()
-      self.query_one(Label).update("showing stats")
-      self.table = self.query_one(DataTable)
-      # update table with rows
+    if not sql.LOGGED_IN:
+      return
+
+    self.query_one(Label).update("Game Stats")
+    self.table = self.query_one(DataTable)
+
+    if sqlcon:
+      rows = iter(sqlcon.pull())
+      self.table.add_columns(*next(rows))
+      self.table.add_rows(rows)
+    else:
+      self.table.add_columns("match_id", "win_or_lose", "time")
+      self.table.add_rows(
+          (
+              (1, "win", 12.34),
+              (2, "lose", 23.68),
+              (3, "win", 54.23),
+              (4, "lose", 146.23),
+          )
+      )
 
   def action_quit(self) -> None:
     self.app.pop_screen()
