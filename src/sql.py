@@ -12,6 +12,7 @@ class sql:
 
     if not self.mycon.is_connected():
       raise mysql.connector.Error("Failed to connect to MySQL")
+
     LOGGED_IN = True
 
     self.table = "Stats"
@@ -27,12 +28,17 @@ class sql:
 
   def create_table(self):
     self.mycur.execute(
-        f"CREATE TABLE IF NOT EXISTS {self.table} (match_id INT AUTO_INCREMENT PRIMARY KEY, win_or_lose CHAR(1), time INT)"
+        f"""CREATE TABLE IF NOT EXISTS {self.table} (
+            match_id INT NOT NULL AUTO_INCREMENT,
+            win_or_lose CHAR(1) NOT NULL,
+            game_duration INT NOT NULL,
+            PRIMARY KEY (match_id)
+        )"""
     )
     self.mycon.commit()
 
-  def insert(self, win_or_lose, time):
-    self.mycur.execute(f"INSERT INTO {self.table} (win_or_lose, time) VALUES ('{win_or_lose}', {time})")
+  def insert(self, win_or_lose, duration):
+    self.mycur.execute(f"INSERT INTO {self.table} (win_or_lose, game_duration) VALUES ('{win_or_lose}', {duration})")
     self.mycon.commit()
 
   def pull(self):
