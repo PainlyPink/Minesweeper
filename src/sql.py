@@ -27,7 +27,7 @@ class sql:
 
   def create_table(self):
     self.mycur.execute(
-        f"CREATE TABLE IF NOT EXISTS {self.table} (match_id INT AUTO_INCREMENT, win_or_lose CHAR(1), time INT)"
+        f"CREATE TABLE IF NOT EXISTS {self.table} (match_id INT AUTO_INCREMENT PRIMARY KEY, win_or_lose CHAR(1), time INT)"
     )
     self.mycon.commit()
 
