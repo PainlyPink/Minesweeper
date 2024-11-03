@@ -1,3 +1,4 @@
+from stat import SF_APPEND
 import mysql.connector
 
 LOGGED_IN = False
@@ -28,12 +29,14 @@ class sql:
 
   def create_table(self):
     self.mycur.execute(
-        f"""CREATE TABLE IF NOT EXISTS {self.table} (
-            match_id INT NOT NULL AUTO_INCREMENT,
-            win_or_lose CHAR(1) NOT NULL,
-            game_duration INT NOT NULL,
-            PRIMARY KEY (match_id)
-        )"""
+        f"""
+      CREATE TABLE IF NOT EXISTS {self.table} (
+        match_id INT NOT NULL AUTO_INCREMENT,
+        win_or_lose CHAR(1) NOT NULL,
+        game_duration INT NOT NULL,
+        PRIMARY KEY (match_id)
+      );
+      """
     )
     self.mycon.commit()
 
